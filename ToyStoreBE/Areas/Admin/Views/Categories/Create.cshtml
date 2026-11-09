@@ -178,7 +178,7 @@
             <p>Vui lòng nhập tên danh mục cần thêm.</p>
         </div>
 
-        @using (Html.BeginForm())
+        @using (Html.BeginForm("Create","Categories",new { area = "Admin" },FormMethod.Post))
         {
             @Html.AntiForgeryToken()
 

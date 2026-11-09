@@ -4,6 +4,19 @@
     ViewBag.Title = "Danh mục";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
 }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
 
 <style>
     .category-page {
@@ -163,6 +176,7 @@
             font-size: 12px;
         }
     }
+
     .product-count {
         display: inline-block;
         min-width: 34px;

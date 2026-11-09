@@ -191,11 +191,11 @@
             </div>
 
             <p class="text-muted" style="margin-top: 12px; font-size: 13px;">
-                Lưu ý: Hành động này có thể ảnh hưởng đến các sản phẩm
-                thuộc danh mục đang chọn.
+                Lưu ý: Không thể xóa danh mục khi vẫn còn sản phẩm thuộc danh mục này.
+                Hãy chuyển sản phẩm sang danh mục khác hoặc xử lý các sản phẩm liên quan trước.
             </p>
 
-            @using (Html.BeginForm())
+            @using (Html.BeginForm("Delete", "Categories", new { area = "Admin", id = Model.CategoryID }, FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 @Html.HiddenFor(model => model.CategoryID)
@@ -210,7 +210,8 @@
                     @Html.ActionLink(
                         "Quay lại danh sách",
                         "Index",
-                        null,
+                        "Categories",
+                        new { area = "Admin" },
                         new { @class = "btn-delete-back" }
                     )
 
