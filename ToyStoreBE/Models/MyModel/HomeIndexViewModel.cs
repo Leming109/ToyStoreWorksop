@@ -7,7 +7,7 @@ namespace ToyStoreBE.Models.MyModel
 {
     public class HomeIndexViewModel
     {
-        public List<Category> Categories { get; set; }
+        public List<ToyStoreBE.Models.Category> Categories { get; set; }
 
         public List<Product> LatestProducts { get; set; }
 
