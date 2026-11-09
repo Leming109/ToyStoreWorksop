@@ -1,0 +1,308 @@
+﻿@model ToyStoreBE.Models.MyModel.NewAccountViewModel
+
+@{
+    ViewBag.Title = "Tạo tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .register-page {
+        min-height: 650px;
+        padding: 25px 20px;
+        background: #f2f2f2;
+    }
+
+    .register-panel {
+        width: 100%;
+        max-width: 1100px;
+        min-height: 630px;
+        margin: 0 auto;
+        padding: 14px;
+        background: #fff;
+    }
+
+    .register-heading {
+        margin: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+        color: #333;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+        .register-heading span {
+            display: block;
+            width: 145px;
+            margin-bottom: -11px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e53935;
+        }
+
+    .register-form {
+        width: 100%;
+        max-width: 320px;
+        margin: 26px auto 20px;
+    }
+
+    .register-input-group {
+        display: flex;
+        align-items: center;
+        height: 38px;
+        margin-bottom: 8px;
+        border: 1px solid #ddd;
+        background: #fff;
+    }
+
+    .register-input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 100%;
+        flex-shrink: 0;
+        border-right: 1px solid #ddd;
+        color: #aaa;
+        font-size: 13px;
+    }
+
+    .register-input-group input {
+        width: 100%;
+        height: 100%;
+        padding: 0 10px;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        font-size: 13px;
+    }
+
+    .register-input-group:focus-within {
+        border-color: #e53935;
+    }
+
+        .register-input-group:focus-within .register-input-icon {
+            color: #e53935;
+        }
+
+    .register-field-error {
+        display: block;
+        margin: -4px 0 7px;
+        color: #dc2626;
+        font-size: 11px;
+    }
+
+    .register-validation {
+        margin-bottom: 12px;
+        color: #dc2626;
+        font-size: 12px;
+    }
+
+    .register-submit {
+        width: 100%;
+        height: 38px;
+        margin-top: 6px;
+        border: none;
+        background: #e53935;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .register-submit:hover {
+            background: #c62828;
+        }
+
+    .register-options {
+        margin-top: 17px;
+        color: #555;
+        font-size: 12px;
+        text-align: left;
+    }
+
+        .register-options a {
+            color: #e53935;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .register-options a:hover {
+                text-decoration: underline;
+            }
+
+    .register-home {
+        margin-top: 20px;
+        font-size: 12px;
+    }
+
+        .register-home a {
+            color: #e53935;
+            text-decoration: none;
+        }
+
+    @@media(max-width: 600px) {
+        .register-page {
+            padding: 15px 10px;
+        }
+
+        .register-panel {
+            min-height: 600px;
+        }
+
+        .register-form {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+    }
+</style>
+
+<div class="register-page">
+    <div class="register-panel">
+
+        <h2 class="register-heading">
+            <span>TẠO TÀI KHOẢN</span>
+        </h2>
+
+        <div class="register-form">
+
+            @using (Html.BeginForm("NewAccount", "Login", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(
+                    false,
+                    "",
+                    new { @class = "register-validation" }
+                )
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-regular fa-user"></i>
+                    </span>
+
+                    @Html.TextBoxFor(m => m.Username, new
+                    {
+                        placeholder = "Tên tài khoản",
+                        maxlength = "255",
+                        autocomplete = "username"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.Username, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-regular fa-user"></i>
+                    </span>
+
+                    @Html.TextBoxFor(m => m.CustomerName, new
+                    {
+                        placeholder = "Họ và tên"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.CustomerName, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </span>
+
+                    @Html.TextBoxFor(m => m.CustomerPhone, new
+                    {
+                        placeholder = "Số điện thoại",
+                        type = "tel",
+                        maxlength = "15",
+                        inputmode = "numeric"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.CustomerPhone, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-regular fa-envelope"></i>
+                    </span>
+
+                    @Html.TextBoxFor(m => m.CustomerEmail, new
+                    {
+                        placeholder = "Email",
+                        type = "email"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.CustomerEmail, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    @Html.TextBoxFor(m => m.CustomerAddress, new
+                    {
+                        placeholder = "Địa chỉ"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.CustomerAddress, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+
+                    @Html.PasswordFor(m => m.Password, new
+                    {
+                        placeholder = "Mật khẩu",
+                        autocomplete = "new-password"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.Password, "",
+                    new { @class = "register-field-error" })
+
+                <div class="register-input-group">
+                    <span class="register-input-icon">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+
+                    @Html.PasswordFor(m => m.ConfirmPassword, new
+                    {
+                        placeholder = "Xác nhận mật khẩu",
+                        autocomplete = "new-password"
+                    })
+                </div>
+
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "",
+                    new { @class = "register-field-error" })
+
+                <button type="submit" class="register-submit">
+                    ĐĂNG KÝ
+                </button>
+            }
+
+            <div class="register-options">
+                Đã có tài khoản?
+                <a href="@Url.Action("Login", "Login")">
+                    Đăng nhập
+                </a>
+            </div>
+
+            <div class="register-home">
+                <a href="@Url.Action("Index", "Home")">
+                    ← Quay lại trang chủ
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

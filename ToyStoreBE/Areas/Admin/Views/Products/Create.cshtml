@@ -1,0 +1,438 @@
+﻿@model ToyStoreBE.Models.Product
+
+@{
+    ViewBag.Title = "Thêm Hàng Hóa";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<style>
+    /* ===== Giao diện thêm sản phẩm ===== */
+
+    .create-product-page {
+        color: #1e293b;
+        padding: 12px 0 35px;
+    }
+
+    .create-product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+        .create-product-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #0f172a;
+        }
+
+        .create-product-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    .create-product-breadcrumb {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-bottom: 8px;
+    }
+
+        .create-product-breadcrumb span {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+    /* Bố cục chính */
+
+    .create-product-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .create-product-main,
+    .create-product-sidebar {
+        min-width: 0;
+    }
+
+    .create-product-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .create-product-card-header {
+        padding: 22px 25px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+        .create-product-card-header h4 {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            color: #1e293b;
+        }
+
+        .create-product-card-header p {
+            margin: 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+    .create-product-card-body {
+        padding: 25px;
+    }
+
+    /* Khu vực nút */
+
+    .create-product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+        .create-product-footer .footer-note {
+            font-size: 12px;
+            color: #64748b;
+            margin: 0;
+        }
+
+    .create-product-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-save-product,
+    .btn-cancel-product {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-save-product {
+        border: 1px solid #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+        .btn-save-product:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #ffffff;
+        }
+
+    .btn-cancel-product {
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+    }
+
+        .btn-cancel-product:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            text-decoration: none;
+        }
+
+    /* Hướng dẫn bên phải */
+
+    .create-product-sidebar .info-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .info-card h4 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 18px;
+        color: #1e293b;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .info-icon {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .info-item strong {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 4px;
+        color: #334155;
+    }
+
+    .info-item p {
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .info-highlight {
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 10px;
+        padding: 15px;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+        .info-highlight strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+    /* Đồng bộ các trường nhập liệu trong Partial View */
+
+    .create-product-card .form-control {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        min-height: 42px;
+        padding: 10px 13px;
+        box-shadow: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .create-product-card .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+    .create-product-card label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    .create-product-card .form-group {
+        margin-bottom: 20px;
+    }
+
+    .create-product-card .text-danger {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    .create-product-validation {
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 1100px) {
+        .create-product-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .create-product-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .create-product-header h2 {
+            font-size: 23px;
+        }
+
+        .create-product-card-body {
+            padding: 18px;
+        }
+
+        .create-product-card-header {
+            padding: 18px;
+        }
+
+        .create-product-footer {
+            padding: 18px;
+            align-items: stretch;
+        }
+
+        .create-product-buttons {
+            width: 100%;
+        }
+
+            .create-product-buttons button,
+            .create-product-buttons a {
+                flex: 1;
+            }
+
+        .create-product-sidebar {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="create-product-page">
+
+    <!-- Tiêu đề trang -->
+    <div class="create-product-header">
+
+        <div>
+            <div class="create-product-breadcrumb">
+                Quản lý sản phẩm / <span>Thêm sản phẩm</span>
+            </div>
+
+            <h2>Thêm sản phẩm mới</h2>
+
+            <p>
+                Tạo sản phẩm mới và cập nhật vào danh mục hàng hóa của ToyStore.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Bố cục form và hướng dẫn -->
+    <div class="create-product-layout">
+
+        <!-- Form chính -->
+        <div class="create-product-main">
+
+            <div class="create-product-card">
+
+                <div class="create-product-card-header">
+                    <h4>Thông tin sản phẩm</h4>
+                    <p>Điền thông tin chi tiết cho sản phẩm mới của bạn.</p>
+                </div>
+
+                @using (Html.BeginForm(
+                    "Create",
+                    "Products",
+                    FormMethod.Post,
+                    new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="create-product-card-body">
+
+                        <div class="create-product-validation">
+                            @Html.ValidationSummary(
+                                true,
+                                "",
+                                new { @class = "text-danger" })
+                        </div>
+
+                        @Html.Partial("PV_Product", Model)
+
+                    </div>
+
+                    <div class="create-product-footer">
+
+                        <p class="footer-note">
+                            Vui lòng kiểm tra thông tin trước khi lưu.
+                        </p>
+
+                        <div class="create-product-buttons">
+
+                            @Html.ActionLink(
+                                "Quay lại",
+                                "Index",
+                                null,
+                                new { @class = "btn-cancel-product" })
+
+                            <button type="submit" class="btn-save-product">
+                                Thêm sản phẩm
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <!-- Hướng dẫn bên phải -->
+        <div class="create-product-sidebar">
+
+            <div class="info-card">
+
+                <h4>Hướng dẫn nhập liệu</h4>
+
+                <div class="info-item">
+                    <div class="info-icon">01</div>
+                    <div>
+                        <strong>Thông tin sản phẩm</strong>
+                        <p>Nhập tên, giá bán và các thông tin cần thiết.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">02</div>
+                    <div>
+                        <strong>Danh mục sản phẩm</strong>
+                        <p>Chọn danh mục phù hợp để khách hàng dễ tìm kiếm.</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">03</div>
+                    <div>
+                        <strong>Hình ảnh sản phẩm</strong>
+                        <p>Chọn ảnh rõ nét, đúng với sản phẩm thực tế.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="info-highlight">
+                <strong>Lưu ý</strong>
+                Hãy kiểm tra giá bán, số lượng và hình ảnh trước khi thêm sản phẩm.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

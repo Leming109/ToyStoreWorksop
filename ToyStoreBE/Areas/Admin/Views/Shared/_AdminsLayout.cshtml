@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Sidebar bên trái */
+        aside {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            overflow-y: auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 10px;
+            z-index: 1000;
+        }
+
+            /* Logo */
+            aside .top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 15px;
+                margin-bottom: 30px;
+            }
+
+            aside .logo a {
+                text-decoration: none;
+            }
+
+            aside .logo h2 {
+                font-size: 24px;
+                color: #333333;
+                margin: 0;
+            }
+
+            aside .logo .danger {
+                color: #e74c3c;
+            }
+
+            aside .close {
+                display: none;
+            }
+
+            /* Các mục menu */
+            aside .sidebar {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding: 0;
+            }
+
+                aside .sidebar a {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    padding: 14px 16px;
+                    color: #555555;
+                    text-decoration: none;
+                    font-size: 15px;
+                    border-radius: 8px;
+                    transition: all 0.2s ease;
+                }
+
+                    aside .sidebar a i {
+                        width: 20px;
+                        text-align: center;
+                        font-size: 18px;
+                        flex-shrink: 0;
+                    }
+
+                    aside .sidebar a:hover {
+                        background-color: #e74c3c;
+                        color: #ffffff;
+                    }
+
+                    aside .sidebar a:active {
+                        background-color: #c0392b;
+                        color: #ffffff;
+                    }
+
+        /* Nội dung chính */
+        .admin-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            padding: 20px 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Nội dung của từng trang */
+        .page-content {
+            flex: 1 0 auto;
+            min-width: 0;
+        }
+
+        /* Footer */
+        .admin-content footer {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside>
+            <div class="top">
+                <div class="logo">
+                    <a href="@Url.Action("Index","Admin")"><h2>Toy<span class="danger">Store</span></h2></a>
+                </div>
+                
+            </div>
+
+            <div class="sidebar">
+                <a href="@Url.Action("Index","Categories")"><i class="fa-solid fa-list"></i><span>Danh Mục</span></a>
+                <a href="@Url.Action("Index","Products")"><i class="fa-brands fa-dropbox"></i><span>Hàng Hóa</span></a>
+                <a href="@Url.Action("Index","Users")"><i class="fa-solid fa-user"></i><span>Người Dùng</span></a>
+                <a href="@Url.Action("Index","Customers")"><i class="fa-solid fa-users"></i><span>Khách Hàng</span></a>
+                <a href="@Url.Action("Index","Orders")"><i class="fa-solid fa-basket-shopping"></i><span>Đơn Hàng</span></a>
+
+            </div>
+        </aside>
+    </div>
+
+    <div class="admin-content">
+
+        <!-- Nội dung từng trang -->
+        <main class="page-content">
+            @RenderBody()
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+            <hr />
+
+            <p>&copy; @DateTime.Now.Year - ToyStore</p>
+
+            <h4>Contact</h4>
+
+            <p>Nguyễn Lê Minh Khang _ 25DH110096</p>
+
+            <p>Nguyễn lê quốc bảo _ 25DH110940</p>
+
+            <p>Nguyễn Đức Kiên _ 25DH110412</p>
+
+            <p>Đỗ Thế Thành Danh _ 25DH110096</p>
+
+        </footer>
+
+    </div>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+
+    
+</body>
+</html>

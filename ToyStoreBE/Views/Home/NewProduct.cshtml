@@ -1,0 +1,23 @@
+﻿@model IEnumerable<ToyStoreBE.Models.Product>
+
+@{
+    ViewBag.Title = "Sản phẩm mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="padding:25px 10px;">
+    <h2 style="font-weight:700; color:#333;">
+        SẢN PHẨM MỚI
+    </h2>
+
+    <p style="color:#888;">
+        Khám phá những sản phẩm mới nhất tại ToyStore.
+    </p>
+
+    @Html.Partial("_PVProductCatalog", Model)
+
+    <div style="text-align:center; margin-top:25px;">
+        @Html.ActionLink("Quay lại trang chủ", "Index", "Home",
+            null, new { @class = "btn btn-default" })
+    </div>
+</div>

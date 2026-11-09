@@ -1,0 +1,303 @@
+﻿@model ToyStoreBE.Models.ViewModels.SearchProductVM
+@{
+    ViewBag.Title = "Hàng Hóa";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<style>
+    /* Tổng thể trang */
+    .product-search-page {
+        padding: 10px 0 25px;
+        color: #1e293b;
+    }
+
+    .product-search-header {
+        margin-bottom: 25px;
+    }
+
+        .product-search-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #1e293b;
+        }
+
+        .product-search-header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 14px;
+        }
+
+    /* Khung tìm kiếm */
+    .search-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+    }
+
+    .search-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 22px;
+        color: #334155;
+    }
+
+    .search-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-field label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #475569;
+    }
+
+    .search-field .form-control {
+        height: 45px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        box-shadow: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .search-field .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+    .search-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-search {
+        height: 45px;
+        padding: 0 20px;
+        border-radius: 8px;
+        background: #2563eb;
+        border: 1px solid #2563eb;
+        color: #fff;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .btn-search:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #fff;
+        }
+
+    .btn-reset {
+        height: 45px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        background: #fff;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .btn-reset:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            text-decoration: none;
+        }
+
+    /* Thanh sắp xếp */
+    .sort-card {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+    .sort-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+        margin-right: 5px;
+    }
+
+    .sort-link {
+        display: inline-block;
+        padding: 8px 13px;
+        border: 1px solid #e2e8f0;
+        border-radius: 7px;
+        background: #fff;
+        color: #475569;
+        font-size: 13px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .sort-link:hover {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+            text-decoration: none;
+        }
+
+    /* Responsive */
+    @@media (max-width: 1000px) {
+        .search-form {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .search-actions {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .search-form {
+            grid-template-columns: 1fr;
+        }
+
+        .search-actions {
+            grid-column: auto;
+        }
+
+            .search-actions button,
+            .search-actions a {
+                flex: 1;
+            }
+
+        .search-card {
+            padding: 18px;
+        }
+
+        .product-search-header h2 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="product-search-page">
+
+    <div class="product-search-header">
+        <h2>QUẢN LÝ SẢN PHẨM</h2>
+        <p>Tìm kiếm, lọc và sắp xếp sản phẩm trong cửa hàng.</p>
+    </div>
+
+    <div class="search-card">
+
+        <h4 class="search-card-title">Tìm kiếm sản phẩm</h4>
+
+        @using (Html.BeginForm("Index", "Products", FormMethod.Get))
+        {
+            <div class="search-form">
+
+                <div class="search-field">
+                    <label for="SearchTerm">Tên sản phẩm</label>
+                    @Html.TextBoxFor(m => m.SearchTerm, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Nhập tên sản phẩm..."
+                    })
+                </div>
+
+                <div class="search-field">
+                    <label for="MinPrice">Giá tối thiểu</label>
+                    @Html.TextBoxFor(m => m.MinPrice, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Từ giá...",
+                        type = "number",
+                        min = "0"
+                    })
+                </div>
+
+                <div class="search-field">
+                    <label for="MaxPrice">Giá tối đa</label>
+                    @Html.TextBoxFor(m => m.MaxPrice, new
+                    {
+                        @class = "form-control",
+                        placeholder = "Đến giá...",
+                        type = "number",
+                        min = "0"
+                    })
+                </div>
+
+                <div class="search-actions">
+                    <button type="submit" class="btn btn-search">
+                        Tìm kiếm
+                    </button>
+
+                    <a href="@Url.Action("Index", "Products")"
+                       class="btn-reset">
+                        Xóa lọc
+                    </a>
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <div class="sort-card">
+        <span class="sort-label">Sắp xếp theo:</span>
+
+        @Html.ActionLink("Tên A - Z", "Index",
+            new
+            {
+                sortOrder = "name_asc",
+                searchTerm = Model.SearchTerm,
+                minPrice = Model.MinPrice,
+                maxPrice = Model.MaxPrice
+            },
+            new { @class = "sort-link" })
+
+        @Html.ActionLink("Tên Z - A", "Index",
+            new
+            {
+                sortOrder = "name_desc",
+                searchTerm = Model.SearchTerm,
+                minPrice = Model.MinPrice,
+                maxPrice = Model.MaxPrice
+            },
+            new { @class = "sort-link" })
+
+        @Html.ActionLink("Giá thấp đến cao", "Index",
+            new
+            {
+                sortOrder = "price_asc",
+                searchTerm = Model.SearchTerm,
+                minPrice = Model.MinPrice,
+                maxPrice = Model.MaxPrice
+            },
+            new { @class = "sort-link" })
+
+        @Html.ActionLink("Giá cao đến thấp", "Index",
+            new
+            {
+                sortOrder = "price_desc",
+                searchTerm = Model.SearchTerm,
+                minPrice = Model.MinPrice,
+                maxPrice = Model.MaxPrice
+            },
+            new { @class = "sort-link" })
+    </div>
+
+    <div class="product-list-container">
+        @Html.Partial("PV_ProductList", Model)
+    </div>
+
+</div>

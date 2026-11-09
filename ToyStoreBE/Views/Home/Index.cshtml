@@ -1,0 +1,1096 @@
+﻿@model ToyStoreBE.Models.MyModel.HomeIndexViewModel
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<style>
+    .home-store {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 10px 15px 40px;
+        color: #292929;
+    }
+
+    /* TIÊU ĐỀ KHU VỰC */
+    .home-section {
+        margin-bottom: 55px;
+    }
+
+    .home-section-title {
+        margin: 12px 0 18px;
+        text-align: center;
+        font-size: 25px;
+        font-weight: 700;
+        color: #272727;
+        text-transform: uppercase;
+    }
+
+    /* BANNER */
+    .home-banner {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 145px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        padding: 25px 45px;
+        border-radius: 5px;
+        color: #fff;
+    }
+
+    .home-banner-new {
+        background: radial-gradient(circle at 78% 35%, rgba(255,255,255,.25) 0 45px, transparent 46px), radial-gradient(circle at 90% 75%, rgba(255,255,255,.15) 0 75px, transparent 76px), linear-gradient(110deg, #871b36, #e53935 55%, #ff7b65);
+    }
+
+    .home-banner-best {
+        background: radial-gradient(circle at 85% 40%, rgba(255,255,255,.2) 0 65px, transparent 66px), linear-gradient(110deg, #641b1b, #ba2525 55%, #ef4444);
+    }
+
+    .home-banner-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .home-banner-label {
+        display: inline-block;
+        margin-bottom: 7px;
+        padding: 5px 12px;
+        border: 1px solid rgba(255,255,255,.65);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .home-banner h3 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: .5px;
+    }
+
+    .home-banner p {
+        margin: 0;
+        font-size: 14px;
+        color: #fff;
+    }
+
+    .home-banner-icon {
+        position: relative;
+        z-index: 1;
+        padding-right: 30px;
+        color: rgba(255,255,255,.85);
+        font-size: 80px;
+    }
+
+    /* THANH DANH MỤC */
+    .home-category-tabs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin: 20px 0;
+    }
+
+    .home-tab {
+        min-width: 95px;
+        padding: 8px 15px;
+        border: 1px solid #aaa;
+        background: #fff;
+        color: #444;
+        font-size: 13px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .home-tab:hover,
+        .home-tab.active {
+            border-color: #e53935;
+            background: #e53935;
+            color: #fff;
+        }
+
+    /* CAROUSEL */
+    .home-carousel-row {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .home-carousel-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 55px;
+        border: 0;
+        background: transparent;
+        color: #555;
+        font-size: 25px;
+        cursor: pointer;
+    }
+
+        .home-carousel-arrow:hover:not(:disabled) {
+            color: #e53935;
+        }
+
+        .home-carousel-arrow:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+    .home-product-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 15px;
+        min-width: 0;
+    }
+
+    .home-product-card {
+        display: none;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #eee;
+        border-radius: 7px;
+        background: #fff;
+        transition: .2s;
+    }
+
+        .home-product-card:hover {
+            transform: translateY(-3px);
+            border-color: #f5b6b3;
+            box-shadow: 0 5px 16px rgba(0,0,0,.08);
+        }
+
+    .home-product-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 190px;
+        overflow: hidden;
+        padding: 10px;
+        background: #f7f7f7;
+    }
+
+        .home-product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform .25s;
+        }
+
+    .home-product-card:hover .home-product-image img {
+        transform: scale(1.05);
+    }
+
+    .home-product-info {
+        padding: 12px;
+    }
+
+    .home-product-name {
+        display: -webkit-box;
+        min-height: 40px;
+        overflow: hidden;
+        margin: 0 0 10px;
+        color: #333;
+        font-size: 13px;
+        line-height: 1.5;
+        font-weight: 600;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .home-product-category {
+        display: block;
+        margin-bottom: 7px;
+        color: #888;
+        font-size: 11px;
+    }
+
+    .home-product-price {
+        color: #e53935;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .home-old-price {
+        margin-left: 5px;
+        color: #999;
+        font-size: 11px;
+        text-decoration: line-through;
+    }
+
+    .home-detail-button {
+        display: block;
+        margin-top: 11px;
+        padding: 8px;
+        border: 1px solid #e53935;
+        border-radius: 5px;
+        background: #fff;
+        color: #e53935;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: .2s;
+    }
+
+        .home-detail-button:hover {
+            background: #e53935;
+            color: #fff;
+        }
+
+    /* TRẠNG THÁI CAROUSEL */
+    .home-carousel-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 18px;
+        color: #777;
+        font-size: 12px;
+    }
+
+    .home-carousel-counter {
+        min-width: 45px;
+        text-align: center;
+    }
+
+    .home-carousel-empty {
+        display: none;
+        grid-column: 1 / -1;
+        padding: 35px;
+        border: 1px dashed #ddd;
+        color: #888;
+        text-align: center;
+    }
+
+    /* XEM TẤT CẢ */
+    .home-view-all {
+        display: flex;
+        justify-content: center;
+        margin-top: 23px;
+    }
+
+        .home-view-all a {
+            min-width: 150px;
+            padding: 11px 25px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            color: #e53935;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+            .home-view-all a:hover {
+                border-color: #e53935;
+                background: #e53935;
+                color: #fff;
+            }
+
+    /* BỘ SƯU TẬP */
+    .home-collection-section {
+        margin-top: 55px;
+    }
+
+    .home-collection-title {
+        margin-bottom: 22px;
+        text-align: center;
+        color: #333;
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .home-collection-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 23px;
+    }
+
+    .home-collection-card {
+        display: block;
+        overflow: hidden;
+        background: transparent;
+        text-decoration: none !important;
+    }
+
+    .home-collection-image {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        aspect-ratio: 1.45 / 1;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fee2e2, #fecaca 55%, #f87171);
+        background-size: cover;
+        background-position: center;
+        transition: .25s;
+    }
+
+        .home-collection-image i {
+            color: rgba(255,255,255,.8);
+            font-size: 55px;
+            text-shadow: 0 2px 8px rgba(0,0,0,.12);
+        }
+
+    .home-collection-card:hover .home-collection-image {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    }
+
+    .home-collection-name {
+        padding: 10px 5px;
+        color: #333;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .home-collection-card:hover .home-collection-name {
+        color: #e53935;
+    }
+
+    /* KẾT QUẢ TÌM KIẾM */
+    .home-search-heading {
+        margin: 20px 0;
+        color: #333;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .home-search-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 15px;
+    }
+
+        .home-search-grid .home-product-card {
+            display: block;
+        }
+
+    .home-search-empty {
+        padding: 45px 20px;
+        border: 1px dashed #ddd;
+        color: #777;
+        text-align: center;
+    }
+
+    /* RESPONSIVE */
+    @@media(max-width: 1000px) {
+        .home-product-grid,
+        .home-search-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .home-product-image {
+            height: 170px;
+        }
+    }
+
+    @@media(max-width: 650px) {
+        .home-store {
+            padding: 5px 8px 30px;
+        }
+
+        .home-section-title,
+        .home-collection-title {
+            font-size: 20px;
+        }
+
+        .home-banner {
+            min-height: 115px;
+            padding: 18px;
+        }
+
+            .home-banner h3 {
+                font-size: 21px;
+            }
+
+            .home-banner p {
+                font-size: 12px;
+            }
+
+        .home-banner-icon {
+            padding-right: 5px;
+            font-size: 45px;
+        }
+
+        .home-tab {
+            min-width: auto;
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        .home-carousel-row {
+            grid-template-columns: 25px minmax(0, 1fr) 25px;
+            gap: 3px;
+        }
+
+        .home-carousel-arrow {
+            width: 25px;
+            font-size: 20px;
+        }
+
+        .home-product-grid,
+        .home-search-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .home-product-image {
+            height: 145px;
+        }
+
+        .home-product-info {
+            padding: 9px;
+        }
+
+        .home-product-name {
+            font-size: 12px;
+        }
+
+        .home-product-price {
+            font-size: 14px;
+        }
+
+        .home-collection-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+    }
+
+    .home-cart-form {
+        margin-top: 8px;
+    }
+
+    .home-add-cart-button {
+        width: 100%;
+        padding: 9px 7px;
+        border: 1px solid #e53935;
+        border-radius: 5px;
+        background: #e53935;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .home-add-cart-button:hover {
+            background: #c62828;
+            border-color: #c62828;
+        }
+</style>
+
+<div class="home-store">
+    @if (Model.IsSearchMode)
+    {
+        <h2 class="home-search-heading">
+            Kết quả tìm kiếm:
+            @Model.SearchTerm
+        </h2>
+
+        if (Model.SearchResults != null && Model.SearchResults.Any())
+        {
+            <div class="home-search-grid">
+
+                @foreach (var item in Model.SearchResults)
+                {
+                    var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                        ? "~/Content/images/default_img.png"
+                        : item.ProductImage;
+
+                    var displayPrice = item.SalePrice > 0
+                        ? item.SalePrice
+                        : item.ProductPrice;
+
+                    <div class="home-product-card">
+                        <a class="home-product-image"
+                           href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+
+                            <img src="@Url.Content(imagePath)"
+                                 alt="@item.ProductName" />
+                        </a>
+
+                        <div class="home-product-info">
+                            <h3 class="home-product-name">
+                                @item.ProductName
+                            </h3>
+
+                            <div class="home-product-category">
+                                @(item.Category != null
+                                    ? item.Category.CategoryName
+                                    : "Chưa phân loại")
+                            </div>
+
+                            <div class="home-product-price">
+                                @displayPrice.ToString("N0") VNĐ
+                            </div>
+
+                            <a class="home-detail-button"
+                               href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+                                Xem chi tiết
+                            </a>
+                            @using (Html.BeginForm("Add","Cart",new { area = "" },FormMethod.Post,new { @class = "home-cart-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                @Html.Hidden("id", item.ProductID)
+                                @Html.Hidden("quantity", 1)
+
+                                <button type="submit" class="home-add-cart-button">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                    Thêm vào giỏ
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="home-search-empty">
+                Không tìm thấy sản phẩm phù hợp.
+            </div>
+        }
+    }
+    else
+    {
+
+
+        <section class="home-section home-carousel-section"
+                 data-section-type="new">
+
+            <h2 class="home-section-title">
+                <i class="fa-solid fa-star"></i> SẢN PHẨM MỚI <i class="fa-solid fa-star"></i>
+            </h2>
+
+            <div class="home-banner home-banner-new">
+                <div class="home-banner-content">
+                    <span class="home-banner-label">
+                        TOYSTORE COLLECTION
+                    </span>
+
+                    <h3>NEW ARRIVALS</h3>
+
+                    <p>Khám phá những sản phẩm mới nhất tại ToyStore</p>
+                </div>
+
+                <div class="home-banner-icon">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+            </div>
+
+            <div class="home-category-tabs">
+
+                <button type="button"
+                        class="home-tab active"
+                        data-category-id="all">
+                    TẤT CẢ
+                </button>
+
+                @foreach (var category in Model.Categories)
+                {
+                    <button type="button"
+                            class="home-tab"
+                            data-category-id="@category.CategoryID">
+                        @category.CategoryName
+                    </button>
+                }
+
+            </div>
+
+            <div class="home-carousel-row">
+
+                <button type="button"
+                        class="home-carousel-arrow home-prev"
+                        aria-label="Sản phẩm trước">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="home-product-grid">
+
+                    @foreach (var item in Model.LatestProducts)
+                    {
+                        var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                            ? "~/Content/images/default_img.png"
+                            : item.ProductImage;
+
+                        var displayPrice = item.SalePrice > 0
+                            ? item.SalePrice
+                            : item.ProductPrice;
+
+                        <div class="home-product-card"
+                             data-category-id="all">
+
+                            <a class="home-product-image"
+                               href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+
+                                <img src="@Url.Content(imagePath)"
+                                     alt="@item.ProductName" />
+                            </a>
+
+                            <div class="home-product-info">
+
+                                <span class="home-product-category">
+                                    @(item.Category != null
+                                        ? item.Category.CategoryName
+                                        : "Chưa phân loại")
+                                </span>
+
+                                <h3 class="home-product-name">
+                                    @item.ProductName
+                                </h3>
+
+                                <div class="home-product-price">
+                                    @displayPrice.ToString("N0") VNĐ
+
+                                    @if (item.SalePrice > 0 &&
+                                         item.SalePrice < item.ProductPrice)
+                                    {
+                                        <span class="home-old-price">
+                                            @item.ProductPrice.ToString("N0") VNĐ
+                                        </span>
+                                    }
+                                </div>
+
+                                <a class="home-detail-button"
+                                   href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+                                    Xem chi tiết
+                                </a>
+
+                            </div>
+                        </div>
+                    }
+
+                    @foreach (var group in Model.CategoryProducts)
+                    {
+                        foreach (var item in group.LatestProducts)
+                        {
+                            var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                                ? "~/Content/images/default_img.png"
+                                : item.ProductImage;
+
+                            var displayPrice = item.SalePrice > 0
+                                ? item.SalePrice
+                                : item.ProductPrice;
+
+                            <div class="home-product-card"
+                                 data-category-id="@group.CategoryID">
+
+                                <a class="home-product-image"
+                                   href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+
+                                    <img src="@Url.Content(imagePath)"
+                                         alt="@item.ProductName" />
+                                </a>
+
+                                <div class="home-product-info">
+
+                                    <span class="home-product-category">
+                                        @group.CategoryName
+                                    </span>
+
+                                    <h3 class="home-product-name">
+                                        @item.ProductName
+                                    </h3>
+
+                                    <div class="home-product-price">
+                                        @displayPrice.ToString("N0") VNĐ
+                                    </div>
+
+                                    <a class="home-detail-button"
+                                       href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+                                        Xem chi tiết
+                                    </a>
+
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div class="home-carousel-empty">
+                        Danh mục này chưa có sản phẩm.
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        class="home-carousel-arrow home-next"
+                        aria-label="Sản phẩm tiếp theo">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+            </div>
+
+            <div class="home-carousel-footer">
+                <span class="home-carousel-counter">0 sản phẩm</span>
+            </div>
+
+            <div class="home-view-all">
+                <a href="@Url.Action("NewProduct", "Home")">
+                    Xem tất cả
+                </a>
+            </div>
+
+        </section>
+
+        <section class="home-section home-carousel-section"
+                 data-section-type="best">
+
+            <h2 class="home-section-title">
+                ✦ SẢN PHẨM BÁN CHẠY ✦
+            </h2>
+
+            <div class="home-banner home-banner-best">
+                <div class="home-banner-content">
+
+                    <span class="home-banner-label">
+                        TOYSTORE BEST SELLER
+                    </span>
+
+                    <h3>SẢN PHẨM BÁN CHẠY</h3>
+
+                    <p>Những sản phẩm được khách hàng lựa chọn nhiều nhất</p>
+
+                </div>
+
+                <div class="home-banner-icon">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+            </div>
+
+            <div class="home-category-tabs">
+
+                <button type="button"
+                        class="home-tab active"
+                        data-category-id="all">
+                    TẤT CẢ
+                </button>
+
+                @foreach (var category in Model.Categories)
+                {
+                    <button type="button"
+                            class="home-tab"
+                            data-category-id="@category.CategoryID">
+                        @category.CategoryName
+                    </button>
+                }
+
+            </div>
+
+            <div class="home-carousel-row">
+
+                <button type="button"
+                        class="home-carousel-arrow home-prev"
+                        aria-label="Sản phẩm trước">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div class="home-product-grid">
+
+                    @foreach (var item in Model.BestSellingProducts)
+                    {
+                        var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                            ? "~/Content/images/default_img.png"
+                            : item.ProductImage;
+
+                        var displayPrice = item.SalePrice > 0
+                            ? item.SalePrice
+                            : item.ProductPrice;
+
+                        <div class="home-product-card"
+                             data-category-id="all">
+
+                            <a class="home-product-image"
+                               href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+
+                                <img src="@Url.Content(imagePath)"
+                                     alt="@item.ProductName" />
+                            </a>
+
+                            <div class="home-product-info">
+
+                                <span class="home-product-category">
+                                    @(item.Category != null
+                                        ? item.Category.CategoryName
+                                        : "Chưa phân loại")
+                                </span>
+
+                                <h3 class="home-product-name">
+                                    @item.ProductName
+                                </h3>
+
+                                <div class="home-product-price">
+                                    @displayPrice.ToString("N0") VNĐ
+
+                                    @if (item.SalePrice > 0 &&
+                                         item.SalePrice < item.ProductPrice)
+                                    {
+                                        <span class="home-old-price">
+                                            @item.ProductPrice.ToString("N0") VNĐ
+                                        </span>
+                                    }
+                                </div>
+
+                                <a class="home-detail-button"
+                                   href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+                                    Xem chi tiết
+                                </a>
+
+                            </div>
+                        </div>
+                    }
+
+                    @foreach (var group in Model.CategoryProducts)
+                    {
+                        foreach (var item in group.BestSellingProducts)
+                        {
+                            var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                                ? "~/Content/images/default_img.png"
+                                : item.ProductImage;
+
+                            var displayPrice = item.SalePrice > 0
+                                ? item.SalePrice
+                                : item.ProductPrice;
+
+                            <div class="home-product-card"
+                                 data-category-id="@group.CategoryID">
+
+                                <a class="home-product-image"
+                                   href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+
+                                    <img src="@Url.Content(imagePath)"
+                                         alt="@item.ProductName" />
+                                </a>
+
+                                <div class="home-product-info">
+
+                                    <span class="home-product-category">
+                                        @group.CategoryName
+                                    </span>
+
+                                    <h3 class="home-product-name">
+                                        @item.ProductName
+                                    </h3>
+
+                                    <div class="home-product-price">
+                                        @displayPrice.ToString("N0") VNĐ
+                                    </div>
+
+                                    <a class="home-detail-button"
+                                       href="@Url.Action("Details", "Home", new { id = item.ProductID })">
+                                        Xem chi tiết
+                                    </a>
+
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div class="home-carousel-empty">
+                        Danh mục này chưa có sản phẩm bán chạy.
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        class="home-carousel-arrow home-next"
+                        aria-label="Sản phẩm tiếp theo">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+            </div>
+
+            <div class="home-carousel-footer">
+                <span class="home-carousel-counter">0 sản phẩm</span>
+            </div>
+
+            <div class="home-view-all">
+                <a href="@Url.Action("BestSaleProduct", "Home")">
+                    Xem tất cả
+                </a>
+            </div>
+
+        </section>
+
+        <section class="home-collection-section">
+
+            <h2 class="home-collection-title">
+                ✦ BỘ SƯU TẬP CHO BÉ ✦
+            </h2>
+
+            <div class="home-collection-grid">
+
+                @foreach (var item in Model.Collections)
+                {
+                    <a class="home-collection-card"
+                       href="@Url.Action("Index", "Home", new { searchTerm = item.SearchTerm })">
+
+                        <div class="home-collection-image"
+                             style="background-image:
+                                linear-gradient(rgba(180,30,30,.12), rgba(180,30,30,.12)),
+                                url('@Url.Content(item.ImagePath)');">
+
+                            <i class="fa-solid fa-car-side"></i>
+                        </div>
+
+                        <div class="home-collection-name">
+                            @item.Name
+                        </div>
+
+                    </a>
+                }
+
+            </div>
+
+        </section>
+
+    }
+
+</div>
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var sections = document.querySelectorAll(
+                ".home-carousel-section"
+            );
+
+            sections.forEach(function (section) {
+
+                var cards = Array.from(
+                    section.querySelectorAll(".home-product-card")
+                );
+
+                var tabs = section.querySelectorAll(".home-tab");
+
+                var previousButton = section.querySelector(".home-prev");
+                var nextButton = section.querySelector(".home-next");
+
+                var counter = section.querySelector(
+                    ".home-carousel-counter"
+                );
+
+                var emptyMessage = section.querySelector(
+                    ".home-carousel-empty"
+                );
+
+                var activeCategory = "all";
+                var currentPage = 0;
+                var pageSize = 5;
+
+                function updateCarousel() {
+
+                    var filteredCards = cards.filter(function (card) {
+                        return card.getAttribute("data-category-id")
+                            === activeCategory;
+                    });
+
+                    cards.forEach(function (card) {
+                        card.style.display = "none";
+                    });
+
+                    var totalProducts = filteredCards.length;
+                    var totalPages = Math.ceil(totalProducts / pageSize);
+
+                    if (totalPages > 0 && currentPage >= totalPages) {
+                        currentPage = totalPages - 1;
+                    }
+
+                    var startIndex = currentPage * pageSize;
+                    var endIndex = startIndex + pageSize;
+
+                    filteredCards.forEach(function (card, index) {
+
+                        if (index >= startIndex && index < endIndex) {
+                            card.style.display = "block";
+                        }
+
+                    });
+
+                    previousButton.disabled = currentPage <= 0;
+
+                    nextButton.disabled =
+                        totalPages === 0 ||
+                        currentPage >= totalPages - 1;
+
+                    if (totalProducts === 0) {
+                        counter.textContent = "0 sản phẩm";
+                    } else {
+                        counter.textContent =
+                            "Trang " + (currentPage + 1) +
+                            " / " + totalPages;
+                    }
+
+                    emptyMessage.style.display =
+                        totalProducts === 0 ? "block" : "none";
+                }
+
+                tabs.forEach(function (tab) {
+
+                    tab.addEventListener("click", function () {
+
+                        tabs.forEach(function (otherTab) {
+                            otherTab.classList.remove("active");
+                        });
+
+                        tab.classList.add("active");
+
+                        activeCategory =
+                            tab.getAttribute("data-category-id");
+
+                        currentPage = 0;
+
+                        updateCarousel();
+                    });
+
+                });
+
+                previousButton.addEventListener("click", function () {
+
+                    if (currentPage > 0) {
+                        currentPage--;
+                        updateCarousel();
+                    }
+
+                });
+
+                nextButton.addEventListener("click", function () {
+
+                    var filteredCards = cards.filter(function (card) {
+                        return card.getAttribute("data-category-id")
+                            === activeCategory;
+                    });
+
+                    var totalPages = Math.ceil(
+                        filteredCards.length / pageSize
+                    );
+
+                    if (currentPage < totalPages - 1) {
+                        currentPage++;
+                        updateCarousel();
+                    }
+
+                });
+                updateCarousel();
+
+            });
+
+        });
+    </script>
+}

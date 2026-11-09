@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace ToyStoreBE.Models.MyModel
+{
+    [MetadataType(typeof(CategoryMetadata))]
+    public partial class Category
+    {
+    }
+    public class CategoryMetadata
+    {
+        [Required(ErrorMessage = "Vui lòng nhập tên danh mục.")]
+        [Display(Name = "Tên danh mục")]
+        public string CategoryName { get; set; }
+    }
+}

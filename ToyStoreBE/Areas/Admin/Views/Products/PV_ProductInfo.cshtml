@@ -1,0 +1,238 @@
+﻿<style>
+    .product-info-card {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 30px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 28px;
+        margin: 20px 0;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Khu vực hình ảnh */
+    .product-info-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        padding: 20px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+        .product-info-image img {
+            display: block;
+            width: 100%;
+            max-width: 250px;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+    .product-info-no-image {
+        color: #94a3b8;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    /* Khu vực thông tin */
+    .product-info-content {
+        min-width: 0;
+    }
+
+    .product-info-label {
+        display: inline-block;
+        padding: 5px 12px;
+        margin-bottom: 12px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .product-info-name {
+        font-size: 26px;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.4;
+        margin: 0 0 20px;
+        overflow-wrap: anywhere;
+    }
+
+    .product-info-price {
+        display: inline-block;
+        padding: 12px 18px;
+        margin-bottom: 25px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 10px;
+        color: #15803d;
+    }
+
+        .product-info-price span {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .product-info-price strong {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+    .product-info-details {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .product-info-detail {
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+        .product-info-detail:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .product-info-detail dt {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        .product-info-detail dd {
+            margin: 0;
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+    .product-info-description {
+        white-space: pre-line;
+    }
+
+    .product-info-category {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #f1f5f9;
+        border-radius: 6px;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .product-info-card {
+            grid-template-columns: 1fr;
+            padding: 18px;
+            gap: 22px;
+        }
+
+        .product-info-image {
+            min-height: 220px;
+        }
+
+            .product-info-image img {
+                height: 220px;
+            }
+
+        .product-info-name {
+            font-size: 22px;
+        }
+
+        .product-info-price strong {
+            font-size: 21px;
+        }
+    }
+</style>
+
+<div class="product-info-card">
+
+    <!-- Hình ảnh sản phẩm -->
+    <div class="product-info-image">
+
+        @if (!string.IsNullOrWhiteSpace(Model.ProductImage))
+        {
+            <img src="@Url.Content(Model.ProductImage)"
+                 alt="@Model.ProductName" />
+        }
+        else
+        {
+            <div class="product-info-no-image">
+                Chưa có hình ảnh sản phẩm
+            </div>
+        }
+
+    </div>
+
+    <!-- Thông tin sản phẩm -->
+    <div class="product-info-content">
+
+        <span class="product-info-label">
+            THÔNG TIN SẢN PHẨM
+        </span>
+
+        <h2 class="product-info-name">
+            @Model.ProductName
+        </h2>
+
+        <div class="product-info-price">
+            <span>Giá bán</span>
+
+            <strong>
+                @string.Format(
+                         System.Globalization.CultureInfo.GetCultureInfo("vi-VN"),
+                         "{0:N0} VNĐ",
+                         Model.ProductPrice
+                     )
+            </strong>
+        </div>
+
+        <dl class="product-info-details">
+
+            <div class="product-info-detail">
+                <dt>Mô tả sản phẩm</dt>
+
+                <dd class="product-info-description">
+                    @if (!string.IsNullOrWhiteSpace(Model.ProductDecription))
+                    {
+                        @Model.ProductDecription
+                    }
+                    else
+                    {
+                        <span>Chưa có mô tả cho sản phẩm này.</span>
+                    }
+                </dd>
+            </div>
+
+            <div class="product-info-detail">
+                <dt>Danh mục</dt>
+
+                <dd>
+                    @if (Model.Category != null)
+                    {
+                        <span class="product-info-category">
+                            @Model.Category.CategoryName
+                        </span>
+                    }
+                    else
+                    {
+                        <span>Chưa phân loại</span>
+                    }
+                </dd>
+            </div>
+
+        </dl>
+
+    </div>
+
+</div>

@@ -1,0 +1,361 @@
+﻿@model IEnumerable<ToyStoreBE.Models.Customer>
+@using System.Linq
+
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    int totalCustomers = Model == null ? 0 : Model.Count();
+}
+
+<style>
+    .customer-page {
+        padding: 22px 25px;
+        color: #1e293b;
+    }
+
+    /* Tiêu đề */
+    .customer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+        .customer-header h2 {
+            margin: 0 0 8px;
+            color: #1e293b;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .customer-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    /* Thẻ thống kê */
+    .customer-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: fit-content;
+        min-width: 230px;
+        margin-bottom: 22px;
+        padding: 18px 22px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .04);
+    }
+
+    .customer-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 21px;
+    }
+
+    .customer-stat-info span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .customer-stat-info strong {
+        display: block;
+        margin-top: 4px;
+        color: #1e293b;
+        font-size: 23px;
+    }
+
+    /* Bảng khách hàng */
+    .customer-card {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, .04);
+    }
+
+    .customer-card-header {
+        padding: 19px 22px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #fff;
+    }
+
+        .customer-card-header h3 {
+            margin: 0;
+            color: #334155;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+    .customer-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+    }
+
+        .customer-table thead {
+            background: #f1f5f9;
+        }
+
+        .customer-table th {
+            padding: 16px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .customer-table td {
+            padding: 16px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .customer-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .customer-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* Username */
+    .customer-username {
+        color: #2563eb;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* Tên khách hàng */
+    .customer-name {
+        color: #1e293b;
+        font-weight: 600;
+        min-width: 130px;
+    }
+
+    /* Email */
+    .customer-email {
+        min-width: 170px;
+        overflow-wrap: anywhere;
+    }
+
+    /* Địa chỉ */
+    .customer-address {
+        min-width: 160px;
+        max-width: 250px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    /* Trạng thái mật khẩu */
+    .customer-password-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
+        border-radius: 20px;
+        background: #ecfdf5;
+        color: #059669;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .customer-password-status i {
+            font-size: 11px;
+        }
+
+    .customer-empty {
+        padding: 40px 20px !important;
+        color: #94a3b8 !important;
+        text-align: center;
+    }
+
+    /* Chân bảng */
+    .customer-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 20px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+        .customer-card-footer strong {
+            color: #1e293b;
+        }
+
+    @@media (max-width: 768px) {
+        .customer-page {
+            padding: 15px 10px;
+        }
+
+        .customer-header h2 {
+            font-size: 23px;
+        }
+
+        .customer-table th,
+        .customer-table td {
+            padding: 12px 10px;
+        }
+    }
+</style>
+
+<div class="customer-page">
+
+    <!-- TIÊU ĐỀ -->
+    <div class="customer-header">
+        <div>
+            <h2>Danh sách khách hàng</h2>
+            <p>Quản lý và theo dõi thông tin khách hàng của ToyStore.</p>
+        </div>
+    </div>
+
+    <!-- THỐNG KÊ -->
+    <div class="customer-stat-card">
+        <div class="customer-stat-icon">
+            <i class="fa-solid fa-users"></i>
+        </div>
+
+        <div class="customer-stat-info">
+            <span>Tổng số khách hàng</span>
+            <strong>@totalCustomers</strong>
+        </div>
+    </div>
+
+    <!-- BẢNG KHÁCH HÀNG -->
+    <div class="customer-card">
+
+        <div class="customer-card-header">
+            <h3>Thông tin khách hàng</h3>
+        </div>
+
+        <div class="table-responsive">
+            <table class="customer-table">
+
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Họ và tên</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Địa chỉ</th>
+                        <th>Mật khẩu</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            bool passwordIsSet =
+                                item.User != null &&
+                                !String.IsNullOrWhiteSpace(item.User.Password);
+
+                            <tr>
+                                <!-- Username -->
+                                <td>
+                                    <span class="customer-username">
+                                        @item.Username
+                                    </span>
+                                </td>
+
+                                <!-- Tên khách hàng -->
+                                <td>
+                                    <span class="customer-name">
+                                        @item.CustomerName
+                                    </span>
+                                </td>
+
+                                <!-- Số điện thoại -->
+                                <td>
+                                    @item.CustomerPhone
+                                </td>
+
+                                <!-- Email -->
+                                <td>
+                                    <div class="customer-email">
+                                        @item.CustomerEmail
+                                    </div>
+                                </td>
+
+                                <!-- Địa chỉ -->
+                                <td>
+                                    <div class="customer-address">
+                                        @item.CustomerAddress
+                                    </div>
+                                </td>
+
+                                <!-- Trạng thái mật khẩu -->
+                                <td>
+                                    @if (passwordIsSet)
+                                    {
+                                        <span class="customer-password-status">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            Đã thiết lập
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#dc2626; font-size:12px;">
+                                            Chưa thiết lập
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="customer-empty">
+                                <i class="fa-solid fa-users"
+                                   style="font-size:30px; margin-bottom:12px;"></i>
+
+                                <div>Chưa có khách hàng nào trong hệ thống.</div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="customer-card-footer">
+            <span>
+                Tổng số bản ghi:
+                <strong>@totalCustomers khách hàng</strong>
+            </span>
+
+            <span>
+                ToyStore - Quản lý khách hàng
+            </span>
+        </div>
+
+    </div>
+
+</div>

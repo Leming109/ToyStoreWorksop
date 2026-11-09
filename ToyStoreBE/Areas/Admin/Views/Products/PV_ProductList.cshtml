@@ -1,0 +1,437 @@
+﻿@model ToyStoreBE.Models.ViewModels.SearchProductVM
+@using PagedList.Mvc;
+@using System.Globalization;
+
+@{
+    ViewBag.Title = "Danh Sách Sản Phẩm";
+
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<style>
+    /* Tổng thể */
+    .product-list-container {
+        padding: 24px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+        margin: 20px 0;
+    }
+
+    .product-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 24px;
+    }
+
+    .product-list-title {
+        font-size: 25px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .product-list-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    /* Nút thêm sản phẩm */
+    .btn-add-product {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        background: #2563eb;
+        color: #ffffff !important;
+        border-radius: 8px;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+        .btn-add-product:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+    /* Bảng sản phẩm */
+    .product-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .product-table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 0;
+    }
+
+        .product-table thead th {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 16px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .product-table tbody td {
+            padding: 16px 14px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        .product-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+    /* Hình ảnh */
+    .product-image-box {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .product-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 5px;
+        }
+
+    .no-product-image {
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: center;
+        padding: 5px;
+    }
+
+    /* Tên sản phẩm */
+    .product-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+        min-width: 180px;
+    }
+
+    /* Giá tiền */
+    .product-price {
+        font-weight: 700;
+        color: #dc2626;
+        white-space: nowrap;
+        font-size: 15px;
+    }
+
+    /* Danh mục */
+    .product-category {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* Nhóm nút thao tác */
+    .product-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .product-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 12px;
+            border-radius: 6px;
+            text-decoration: none !important;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+    .btn-edit-product {
+        background: #eff6ff;
+        color: #2563eb !important;
+    }
+
+        .btn-edit-product:hover {
+            background: #dbeafe;
+        }
+
+    .btn-detail-product {
+        background: #f1f5f9;
+        color: #475569 !important;
+    }
+
+        .btn-detail-product:hover {
+            background: #e2e8f0;
+        }
+
+    .btn-delete-product {
+        background: #fef2f2;
+        color: #dc2626 !important;
+    }
+
+        .btn-delete-product:hover {
+            background: #fee2e2;
+        }
+
+    /* Trạng thái không có sản phẩm */
+    .product-empty {
+        padding: 50px 20px;
+        text-align: center;
+        color: #64748b;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px dashed #cbd5e1;
+    }
+
+        .product-empty h4 {
+            color: #334155;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+    /* Phân trang */
+    .product-pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+    }
+
+        .product-pagination .pagination {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+            .product-pagination .pagination > li > a,
+            .product-pagination .pagination > li > span {
+                border-radius: 6px;
+                margin: 0;
+                border: 1px solid #e2e8f0;
+                color: #475569;
+            }
+
+            .product-pagination .pagination > .active > a,
+            .product-pagination .pagination > .active > span {
+                background: #2563eb;
+                border-color: #2563eb;
+                color: #ffffff;
+            }
+
+    @@media (max-width: 768px) {
+        .product-list-container {
+            padding: 16px;
+        }
+
+        .product-list-title {
+            font-size: 21px;
+        }
+
+        .product-list-header {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="product-list-container">
+
+    <!-- Tiêu đề -->
+    <div class="product-list-header">
+        <div>
+            <h2 class="product-list-title">
+                Danh sách sản phẩm
+            </h2>
+
+            <div class="product-list-subtitle">
+                Quản lý thông tin và giá bán sản phẩm
+            </div>
+        </div>
+
+        @Html.ActionLink(
+                 "＋ Thêm sản phẩm",
+                 "Create",
+                 "Products",
+                 null,
+                 new { @class = "btn-add-product" }
+             )
+    </div>
+
+    @if (Model.Products != null && Model.Products.Any())
+    {
+        <!-- Bảng sản phẩm -->
+        <div class="product-table-wrapper">
+
+            <table class="product-table">
+
+                <thead>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá bán</th>
+                        <th>Danh mục</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Products)
+                    {
+                        <tr>
+
+                            <!-- Hình ảnh -->
+                            <td>
+                                <div class="product-image-box">
+
+                                    @if (!string.IsNullOrWhiteSpace(item.ProductImage))
+                                    {
+                                        <img src="@Url.Content(item.ProductImage)"
+                                             alt="@item.ProductName" />
+                                    }
+                                    else
+                                    {
+                                        <div class="no-product-image">
+                                            Chưa có ảnh
+                                        </div>
+                                    }
+
+                                </div>
+                            </td>
+
+                            <!-- Tên sản phẩm -->
+                            <td>
+                                <div class="product-name">
+                                    @item.ProductName
+                                </div>
+                            </td>
+
+                            <!-- Giá bán VND -->
+                            <td>
+                                <span class="product-price">
+                                    @string.Format(
+                                             culture,
+                                             "{0:N0} ₫",
+                                             item.ProductPrice
+                                         )
+                                </span>
+                            </td>
+
+                            <!-- Danh mục -->
+                            <td>
+                                @if (item.Category != null)
+                                {
+                                    <span class="product-category">
+                                        @item.Category.CategoryName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>Chưa phân loại</span>
+                                }
+                            </td>
+
+                            <!-- Thao tác -->
+                            <td>
+                                <div class="product-actions">
+
+                                    @Html.ActionLink(
+                                             "Sửa",
+                                             "Edit","Products",
+                                             new { id = item.ProductID },
+                                             new { @class = "btn-edit-product" }
+                                         )
+
+                                    @Html.ActionLink(
+                                             "Chi tiết",
+                                             "Details",
+                                             new { id = item.ProductID },
+                                             new { @class = "btn-detail-product" }
+                                         )
+
+                                    @Html.ActionLink(
+                                             "Xóa",
+                                             "Delete","Products",
+                                             new { id = item.ProductID },
+                                             new { @class = "btn-delete-product" }
+                                         )
+
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- Phân trang -->
+        <div class="product-pagination">
+
+            @Html.PagedListPager(
+                     Model.Products,
+                     page => Url.Action("Index", new
+                     {
+                         page,
+                         searchTerm = Model.SearchTerm,
+                         minPrice = Model.MinPrice,
+                         maxPrice = Model.MaxPrice,
+                         sortOrder = Model.SortOrder
+                     })
+                 )
+
+        </div>
+    }
+    else
+    {
+        <!-- Không tìm thấy sản phẩm -->
+        <div class="product-empty">
+
+            <h4>Không tìm thấy sản phẩm</h4>
+
+            <p>
+                Không có sản phẩm nào phù hợp với điều kiện tìm kiếm hiện tại.
+            </p>
+
+            @Html.ActionLink(
+                     "Thêm sản phẩm mới",
+                     "Create",
+                     "Products",
+                     null,
+                     new { @class = "btn-add-product" }
+                 )
+
+        </div>
+    }
+
+</div>

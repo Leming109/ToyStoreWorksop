@@ -1,0 +1,164 @@
+﻿@model ToyStoreBE.Models.Product
+
+<style>
+    .product-edit-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px 24px;
+    }
+
+    .product-edit-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .product-edit-field .form-control {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: none;
+    }
+
+        .product-edit-field .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+        }
+
+    .product-edit-description {
+        margin-top: 24px;
+        width: 100%;
+        grid-column: 1 / -1;
+    }
+
+        .product-edit-description textarea {
+            display: block;
+            width: 100%;
+            min-height: 190px;
+            box-sizing: border-box;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+            .product-edit-description textarea:focus {
+                outline: none;
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+            }
+
+        .product-edit-field .text-danger,
+        .product-edit-description .text-danger {
+            display: block;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+    @@media (max-width: 650px) {
+        .product-edit-fields {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="product-edit-fields">
+
+    <div class="product-edit-field">
+        <label for="CategoryID">Danh mục</label>
+        @Html.DropDownList(
+                 "CategoryID",
+                 null,
+                 new { @class = "form-control" }
+             )
+        @Html.ValidationMessageFor(
+                 model => model.CategoryID,
+                 "",
+                 new { @class = "text-danger" }
+             )
+    </div>
+
+    <div class="product-edit-field">
+        @Html.LabelFor(model => model.ProductName, "Tên sản phẩm")
+        @Html.EditorFor(
+                 model => model.ProductName,
+                 new
+                 {
+                     htmlAttributes = new
+                     {
+                         @class = "form-control",
+                         placeholder = "Nhập tên sản phẩm"
+                     }
+                 }
+             )
+        @Html.ValidationMessageFor(
+                 model => model.ProductName,
+                 "",
+                 new { @class = "text-danger" }
+             )
+    </div>
+
+    <div class="product-edit-field">
+        @Html.LabelFor(model => model.ProductPrice, "Đơn giá")
+        @Html.EditorFor(
+                 model => model.ProductPrice,
+                 new
+                 {
+                     htmlAttributes = new
+                     {
+                         @class = "form-control",
+                         placeholder = "Nhập đơn giá"
+                     }
+                 }
+             )
+        @Html.ValidationMessageFor(
+                 model => model.ProductPrice,
+                 "",
+                 new { @class = "text-danger" }
+             )
+    </div>
+
+    <div class="product-edit-field">
+        @Html.LabelFor(model => model.ProductImage, "Hình ảnh")
+        @Html.EditorFor(
+                 model => model.ProductImage,
+                 new
+                 {
+                     htmlAttributes = new
+                     {
+                         @class = "form-control",
+                         placeholder = "Nhập đường dẫn hình ảnh"
+                     }
+                 }
+             )
+        @Html.ValidationMessageFor(
+                 model => model.ProductImage,
+                 "",
+                 new { @class = "text-danger" }
+             )
+    </div>
+
+</div>
+
+<div class="product-edit-field product-edit-description">
+    @Html.LabelFor(model => model.ProductDecription, "Mô tả sản phẩm")
+    @Html.TextAreaFor(
+            model => model.ProductDecription,
+            new
+            {
+                placeholder = "Nhập thông tin chi tiết về sản phẩm..."
+            }
+        )
+    @Html.ValidationMessageFor(
+            model => model.ProductDecription,
+            "",
+            new { @class = "text-danger" }
+        )
+</div>

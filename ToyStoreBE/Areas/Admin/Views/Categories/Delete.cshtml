@@ -1,0 +1,224 @@
+﻿@model ToyStoreBE.Models.Category
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<style>
+    .category-delete-page {
+        padding: 20px 25px;
+        color: #1e293b;
+    }
+
+    .category-delete-header {
+        margin-bottom: 25px;
+    }
+
+        .category-delete-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: #1e293b;
+        }
+
+        .category-delete-header p {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+
+    .category-delete-card {
+        max-width: 750px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .category-delete-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 22px 25px;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+    .category-delete-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        background: #fee2e2;
+        color: #dc2626;
+        border-radius: 50%;
+        font-size: 22px;
+    }
+
+    .category-delete-card-header h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #991b1b;
+        margin: 0 0 5px;
+    }
+
+    .category-delete-card-header p {
+        font-size: 14px;
+        color: #b91c1c;
+        margin: 0;
+    }
+
+    .category-delete-body {
+        padding: 25px;
+    }
+
+    .category-delete-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+
+    .category-delete-name {
+        padding: 14px 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .category-delete-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-delete-confirm,
+    .btn-delete-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .btn-delete-confirm {
+        color: #fff;
+        background: #dc2626;
+        border: 1px solid #dc2626;
+    }
+
+        .btn-delete-confirm:hover {
+            color: #fff;
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
+    .btn-delete-back {
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+    }
+
+        .btn-delete-back:hover {
+            color: #1e293b;
+            background: #e2e8f0;
+        }
+
+    @@media (max-width: 576px) {
+        .category-delete-page {
+            padding: 15px 10px;
+        }
+
+        .category-delete-header h2 {
+            font-size: 22px;
+        }
+
+        .category-delete-body {
+            padding: 18px;
+        }
+
+        .category-delete-card-header {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="category-delete-page">
+
+    <div class="category-delete-header">
+        <h2>Xóa danh mục</h2>
+        <p>Quản lý và xóa danh mục sản phẩm trong hệ thống ToyStore.</p>
+    </div>
+
+    <div class="category-delete-card">
+
+        <div class="category-delete-card-header">
+            <div class="category-delete-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <div>
+                <h4>Xác nhận xóa danh mục</h4>
+                <p>Bạn có chắc chắn muốn xóa danh mục này không?</p>
+            </div>
+        </div>
+
+        <div class="category-delete-body">
+
+            <span class="category-delete-label">Tên danh mục</span>
+
+            <div class="category-delete-name">
+                @Html.DisplayFor(model => model.CategoryName)
+            </div>
+
+            <p class="text-muted" style="margin-top: 12px; font-size: 13px;">
+                Lưu ý: Hành động này có thể ảnh hưởng đến các sản phẩm
+                thuộc danh mục đang chọn.
+            </p>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.CategoryID)
+
+                <div class="category-delete-actions">
+
+                    <button type="submit" class="btn-delete-confirm">
+                        <i class="fa-solid fa-trash"></i>
+                        Xác nhận xóa
+                    </button>
+
+                    @Html.ActionLink(
+                        "Quay lại danh sách",
+                        "Index",
+                        null,
+                        new { @class = "btn-delete-back" }
+                    )
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

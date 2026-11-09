@@ -1,0 +1,540 @@
+﻿@model ToyStoreBE.Models.MyModel.AdminDashboardViewModel
+
+@{
+    ViewBag.Title = "Tổng quan quản trị";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<style>
+    .admin-dashboard {
+        padding: 25px;
+        color: #1e293b;
+    }
+
+    /* HEADER */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 28px;
+    }
+
+        .dashboard-header h2 {
+            margin: 0 0 9px;
+            color: #1e293b;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    .dashboard-date {
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    /* THẺ THỐNG KÊ */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+        padding: 21px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(15,23,42,.035);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+        .dashboard-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 18px rgba(15,23,42,.07);
+        }
+
+    .dashboard-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 52px;
+        width: 52px;
+        height: 52px;
+        border-radius: 11px;
+        font-size: 21px;
+    }
+
+    .stat-blue {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .stat-orange {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .stat-green {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .stat-red {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .dashboard-stat-info {
+        min-width: 0;
+    }
+
+        .dashboard-stat-info span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .dashboard-stat-info strong {
+            display: block;
+            margin-top: 6px;
+            color: #1e293b;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+    /* GIÁ TRỊ ĐƠN HÀNG */
+    .dashboard-revenue {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding: 22px 25px;
+        border: 1px solid #f3cccc;
+        border-radius: 12px;
+        background: #fffafa;
+    }
+
+    .dashboard-revenue-info span {
+        display: block;
+        margin-bottom: 8px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .dashboard-revenue-info strong {
+        color: #dc2626;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .dashboard-revenue-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        background: #fee2e2;
+        color: #dc2626;
+        font-size: 24px;
+    }
+
+    /* TRUY CẬP NHANH */
+    .dashboard-section {
+        margin-bottom: 26px;
+        padding: 22px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .dashboard-section-title {
+        margin: 0 0 19px;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .dashboard-shortcuts {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .dashboard-shortcut {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #fff;
+        color: #334155;
+        text-decoration: none !important;
+        transition: .2s;
+    }
+
+        .dashboard-shortcut:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+            color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .dashboard-shortcut i {
+            color: #e53935;
+            font-size: 21px;
+        }
+
+        .dashboard-shortcut span {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+    /* BẢNG ĐƠN HÀNG */
+    .dashboard-table-wrap {
+        overflow-x: auto;
+    }
+
+    .dashboard-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+    }
+
+        .dashboard-table thead {
+            background: #f8fafc;
+        }
+
+        .dashboard-table th {
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .dashboard-table td {
+            padding: 15px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .dashboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+    .dashboard-order-id {
+        color: #2563eb;
+        font-weight: 700;
+    }
+
+    .dashboard-order-price {
+        color: #dc2626;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dashboard-order-status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .dashboard-empty {
+        padding: 35px !important;
+        color: #94a3b8 !important;
+        text-align: center;
+    }
+
+    /* RESPONSIVE */
+    @@media(max-width: 1100px) {
+        .dashboard-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .dashboard-shortcuts {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media(max-width: 600px) {
+        .admin-dashboard {
+            padding: 15px 10px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 22px;
+        }
+
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+            gap: 11px;
+        }
+
+        .dashboard-shortcuts {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-revenue-info strong {
+            font-size: 22px;
+        }
+
+        .dashboard-section {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="admin-dashboard">
+
+    <!-- TIÊU ĐỀ -->
+    <div class="dashboard-header">
+
+        <div>
+            <h2>TỔNG QUAN QUẢN TRỊ</h2>
+
+            <p>
+                Chào mừng bạn đến với hệ thống quản lý ToyStore.
+                Theo dõi tình hình cửa hàng tại đây.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <i class="fa-regular fa-calendar"></i>
+            @DateTime.Now.ToString("dd/MM/yyyy")
+        </div>
+
+    </div>
+
+
+    <!-- THỐNG KÊ -->
+    <div class="dashboard-stats">
+
+        <!-- SẢN PHẨM -->
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon stat-blue">
+                <i class="fa-solid fa-box"></i>
+            </div>
+
+            <div class="dashboard-stat-info">
+                <span>Tổng sản phẩm</span>
+                <strong>@Model.TotalProducts</strong>
+            </div>
+
+        </div>
+
+        <!-- DANH MỤC -->
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon stat-orange">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+
+            <div class="dashboard-stat-info">
+                <span>Tổng danh mục</span>
+                <strong>@Model.TotalCategories</strong>
+            </div>
+
+        </div>
+
+        <!-- KHÁCH HÀNG -->
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon stat-green">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="dashboard-stat-info">
+                <span>Tổng khách hàng</span>
+                <strong>@Model.TotalCustomers</strong>
+            </div>
+
+        </div>
+
+        <!-- ĐƠN HÀNG -->
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon stat-red">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+
+            <div class="dashboard-stat-info">
+                <span>Tổng đơn hàng</span>
+                <strong>@Model.TotalOrders</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TỔNG GIÁ TRỊ ĐƠN HÀNG -->
+    <div class="dashboard-revenue">
+
+        <div class="dashboard-revenue-info">
+            <span>TỔNG GIÁ TRỊ ĐƠN HÀNG ĐÃ TẠO</span>
+
+            <strong>
+                @Model.TotalOrderValue.ToString("N0") VNĐ
+            </strong>
+        </div>
+
+        <div class="dashboard-revenue-icon">
+            <i class="fa-solid fa-money-bill-wave"></i>
+        </div>
+
+    </div>
+
+
+    <!-- TRUY CẬP NHANH -->
+    <div class="dashboard-section">
+
+        <h3 class="dashboard-section-title">
+            <i class="fa-solid fa-bolt"></i>
+            Truy cập nhanh
+        </h3>
+
+        <div class="dashboard-shortcuts">
+
+            <a href="@Url.Action("Index", "Products", new { area = "Admin" })"
+               class="dashboard-shortcut">
+                <i class="fa-solid fa-box-open"></i>
+                <span>Quản lý hàng hóa</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Categories", new { area = "Admin" })"
+               class="dashboard-shortcut">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Quản lý danh mục</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Customers", new { area = "Admin" })"
+               class="dashboard-shortcut">
+                <i class="fa-solid fa-users"></i>
+                <span>Quản lý khách hàng</span>
+            </a>
+
+            <a href="@Url.Action("Index", "Users", new { area = "Admin" })"
+               class="dashboard-shortcut">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Quản lý tài khoản</span>
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ĐƠN HÀNG GẦN ĐÂY -->
+    <div class="dashboard-section">
+
+        <h3 class="dashboard-section-title">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            5 đơn hàng gần đây
+        </h3>
+
+        <div class="dashboard-table-wrap">
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái thanh toán</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model.RecentOrders != null &&
+                         Model.RecentOrders.Any())
+                    {
+                        foreach (var item in Model.RecentOrders)
+                        {
+                            <tr>
+
+                                <td>
+                                    <span class="dashboard-order-id">
+                                        #@item.OrderID
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @item.CustomerName
+                                </td>
+
+                                <td>
+                                    @item.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+
+                                <td>
+                                    <span class="dashboard-order-price">
+                                        @item.TotalAmount.ToString("N0") VNĐ
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="dashboard-order-status">
+                                        @(string.IsNullOrWhiteSpace(item.PaymentStatus)
+                                            ? "Chưa cập nhật"
+                                            : item.PaymentStatus)
+                                    </span>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="dashboard-empty">
+                                <i class="fa-solid fa-inbox"
+                                   style="font-size:28px; margin-bottom:10px;"></i>
+
+                                <div>Chưa có đơn hàng nào trong hệ thống.</div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

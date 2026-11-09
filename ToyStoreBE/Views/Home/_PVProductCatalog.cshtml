@@ -1,0 +1,152 @@
+﻿@model IEnumerable<ToyStoreBE.Models.Product>
+
+<style>
+    .catalog-product-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 22px;
+    }
+
+    .catalog-product-card {
+        overflow: hidden;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+        .catalog-product-card img {
+            width: 100%;
+            height: 190px;
+            padding: 10px;
+            object-fit: contain;
+            background: #f7f7f7;
+        }
+
+    .catalog-product-info {
+        padding: 12px;
+    }
+
+    .catalog-product-name {
+        min-height: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .catalog-product-price {
+        color: #e53935;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .catalog-product-detail {
+        display: block;
+        margin-top: 12px;
+        padding: 8px;
+        border: 1px solid #e53935;
+        border-radius: 5px;
+        color: #e53935;
+        text-align: center;
+        text-decoration: none !important;
+    }
+
+        .catalog-product-detail:hover {
+            background: #e53935;
+            color: #fff;
+        }
+
+    @@media(max-width: 900px) {
+        .catalog-product-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media(max-width: 600px) {
+        .catalog-product-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    .catalog-add-cart {
+        width: 100%;
+        margin-top: 8px;
+        padding: 9px;
+        border: 1px solid #e53935;
+        border-radius: 5px;
+        background: #e53935;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .catalog-add-cart:hover {
+            background: #c62828;
+        }
+</style>
+
+@if (Model != null && Model.Any())
+{
+    <div class="catalog-product-grid">
+
+        @foreach (var item in Model)
+        {
+            var imagePath = string.IsNullOrWhiteSpace(item.ProductImage)
+                ? "~/Content/images/default_img.png"
+                : item.ProductImage;
+
+            var displayPrice = item.SalePrice > 0
+                ? item.SalePrice
+                : item.ProductPrice;
+
+            <div class="catalog-product-card">
+
+                <a href="@Url.Action("Details", "Home",
+                    new { id = item.ProductID })">
+
+                    <img src="@Url.Content(imagePath)"
+                         alt="@item.ProductName" />
+                </a>
+
+                <div class="catalog-product-info">
+
+                    <div class="catalog-product-name">
+                        @item.ProductName
+                    </div>
+
+                    <div class="catalog-product-price">
+                        @displayPrice.ToString("N0") VNĐ
+                    </div>
+
+                    <a class="catalog-product-detail"
+                       href="@Url.Action("Details", "Home",
+                           new { id = item.ProductID })">
+                        Xem chi tiết
+                    </a>
+
+                    @using (Html.BeginForm("Add","Cart",new { area = "" }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.Hidden("id", item.ProductID)
+                        @Html.Hidden("quantity", 1)
+
+                        <button type="submit"
+                                class="catalog-add-cart">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            Thêm vào giỏ hàng
+                        </button>
+                    }
+
+                </div>
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <p style="padding:30px; text-align:center; color:#888;">
+        Chưa có sản phẩm nào.
+    </p>
+}

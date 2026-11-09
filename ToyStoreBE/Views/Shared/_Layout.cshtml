@@ -1,0 +1,943 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - ToyStore</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <style>
+        /* TOÀN BỘ HEADER */
+        .toy-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .toy-header-top {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            min-height: 125px;
+            padding: 20px 3%;
+            background: #fff;
+        }
+
+        /* LOGO */
+        .toy-logo {
+            flex: 0 0 auto;
+            color: #333;
+            font-size: 42px;
+            font-weight: 700;
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+
+            .toy-logo span {
+                color: #f44336;
+            }
+
+        /* TÌM KIẾM */
+        .toy-search {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            height: 70px;
+            min-width: 150px;
+            padding: 0 20px;
+            border: 1px solid #d6dce5;
+            border-radius: 40px;
+            background: #fff;
+        }
+
+            .toy-search i {
+                flex: 0 0 auto;
+                margin-right: 16px;
+                color: #263746;
+                font-size: 24px;
+            }
+
+            .toy-search input {
+                width: 100%;
+                min-width: 0;
+                height: 100%;
+                border: 0;
+                outline: 0;
+                background: transparent;
+                font-size: 18px;
+                box-shadow: none;
+            }
+
+        /* KHU VỰC HOTLINE, USER, GIỎ HÀNG */
+        .toy-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+            .toy-header-actions > a {
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                color: #222;
+                font-size: 18px;
+                text-decoration: none;
+            }
+
+            .toy-header-actions i {
+                color: #f44336;
+                font-size: 25px;
+            }
+
+        /* USER DROPDOWN */
+        .toy-user-dropdown {
+            position: relative;
+        }
+
+        .toy-user-summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            list-style: none;
+            color: #222;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+        }
+
+            .toy-user-summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .toy-user-summary::marker {
+                content: "";
+            }
+
+            .toy-user-summary .user-name {
+                display: inline-block;
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .toy-user-summary .user-chevron {
+                font-size: 12px;
+                color: #777;
+            }
+
+        .toy-user-dropdown[open] .user-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* MENU ĐĂNG XUẤT */
+        .toy-user-menu {
+            position: absolute;
+            top: calc(100% + 18px);
+            right: 0;
+            z-index: 1100;
+            display: none;
+            width: 210px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 9px;
+            background: #fff;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .12);
+        }
+
+        .toy-user-dropdown[open] .toy-user-menu {
+            display: block;
+        }
+
+        .toy-user-menu-title {
+            padding: 8px 9px 12px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .toy-logout-form {
+            margin: 8px 0 0;
+        }
+
+        .toy-logout-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 9px;
+            border: 0;
+            border-radius: 6px;
+            background: #fff;
+            color: #dc2626;
+            text-align: left;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+            .toy-logout-button i {
+                color: #dc2626;
+                font-size: 16px;
+            }
+
+            .toy-logout-button:hover {
+                background: #fff1f1;
+            }
+
+        /* DANH MỤC */
+        .toy-category-nav {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            min-height: 70px;
+            padding: 0 3%;
+            background: #f44336;
+        }
+
+            .toy-category-nav a {
+                display: flex;
+                align-items: center;
+                min-height: 70px;
+                padding: 0 24px;
+                color: #fff;
+                font-size: 17px;
+                font-weight: 600;
+                text-decoration: none;
+                white-space: nowrap;
+            }
+
+                .toy-category-nav a:hover {
+                    background: #d9342a;
+                }
+
+        /* NỘI DUNG */
+        .toy-page-content {
+            min-height: 60vh;
+            padding: 24px 3%;
+            background: #fff;
+        }
+
+        /* TABLET */
+        @@media (max-width: 1000px) {
+            .toy-header-top {
+                flex-wrap: wrap;
+                gap: 16px;
+                padding: 18px;
+            }
+
+            .toy-logo {
+                font-size: 34px;
+            }
+
+            .toy-search {
+                order: 3;
+                flex-basis: 100%;
+                height: 54px;
+            }
+
+            .toy-header-actions {
+                margin-left: auto;
+                gap: 16px;
+            }
+
+                .toy-header-actions > a {
+                    font-size: 15px;
+                }
+
+            .toy-category-nav {
+                overflow-x: auto;
+                padding: 0 10px;
+            }
+
+                .toy-category-nav a {
+                    padding: 0 16px;
+                    font-size: 15px;
+                }
+        }
+
+        /* MOBILE */
+        @@media (max-width: 600px) {
+            .toy-header-actions {
+                gap: 12px;
+            }
+
+                .toy-header-actions > a {
+                    gap: 6px;
+                    font-size: 13px;
+                }
+
+                .toy-header-actions i {
+                    font-size: 19px;
+                }
+
+            .toy-user-summary {
+                gap: 5px;
+                font-size: 13px;
+            }
+
+                .toy-user-summary i {
+                    font-size: 19px;
+                }
+
+                .toy-user-summary .user-name {
+                    max-width: 85px;
+                }
+
+            .toy-page-content {
+                padding: 18px 12px;
+            }
+        }
+        .toy-footer {
+            width: 100%;
+            margin-top: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* SOCIAL */
+        .toy-footer-social {
+            padding: 25px 20px 30px;
+            background: #f3f3f3;
+            text-align: center;
+        }
+
+        .toy-footer-social-title {
+            margin: 0 0 20px;
+            color: #222;
+            font-size: 17px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .toy-social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 17px;
+            margin-bottom: 20px;
+        }
+
+            .toy-social-links a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 37px;
+                height: 37px;
+                border-radius: 7px;
+                color: #fff;
+                font-size: 25px;
+                text-decoration: none;
+                transition: transform .2s ease;
+            }
+
+                .toy-social-links a:hover {
+                    transform: translateY(-4px);
+                    text-decoration: none;
+                }
+
+        .toy-social-facebook {
+            background: #1877f2;
+        }
+
+        .toy-social-instagram {
+            background: #d62976;
+        }
+
+        .toy-social-youtube {
+            background: #ff0000;
+        }
+
+        .toy-social-tiktok {
+            background: #111;
+        }
+
+        .toy-social-divider {
+            width: 100%;
+            max-width: 760px;
+            height: 1px;
+            margin: 0 auto;
+            background: #d1d1d1;
+        }
+
+        /* FOOTER INFORMATION */
+        .toy-footer-main {
+            padding: 45px 20px;
+            background: #858585;
+            color: #fff;
+        }
+
+        .toy-footer-container {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1fr;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .toy-footer-column {
+            min-width: 0;
+            padding: 0 20px;
+            border-right: 1px solid rgba(255,255,255,.55);
+        }
+
+            .toy-footer-column:first-child {
+                padding-left: 0;
+            }
+
+            .toy-footer-column:last-child {
+                padding-right: 0;
+                border-right: none;
+            }
+
+        .toy-footer-logo {
+            margin-bottom: 18px;
+            color: #fff;
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+            .toy-footer-logo span {
+                color: #ff514a;
+            }
+
+        .toy-footer-intro {
+            margin-bottom: 16px;
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .toy-footer-title {
+            margin: 10px 0 18px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .toy-footer-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-bottom: 11px;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+            .toy-footer-info i {
+                flex: 0 0 15px;
+                margin-top: 2px;
+                color: #ff514a;
+                font-size: 13px;
+            }
+
+        .toy-footer-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+            .toy-footer-list li {
+                margin-bottom: 13px;
+            }
+
+            .toy-footer-list a {
+                color: #fff;
+                font-size: 12px;
+                text-decoration: none;
+                transition: color .2s;
+            }
+
+                .toy-footer-list a:hover {
+                    color: #ffc7c5;
+                    text-decoration: underline;
+                }
+
+        /* PAYMENT */
+        .toy-payment-title {
+            margin: 25px 0 14px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .toy-payment-list {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .toy-payment-item {
+            padding: 5px 8px;
+            border-radius: 4px;
+            background: #fff;
+            color: #333;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* FOOTER BOTTOM */
+        .toy-footer-bottom {
+            padding: 16px 20px;
+            background: #4b4b4b;
+            color: #fff;
+            text-align: center;
+        }
+
+            .toy-footer-bottom p {
+                margin: 4px 0;
+                font-size: 11px;
+                line-height: 1.5;
+            }
+
+            .toy-footer-bottom strong {
+                color: #ff7770;
+            }
+
+        /* RESPONSIVE */
+        @@media (max-width: 900px) {
+            .toy-footer-container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                row-gap: 30px;
+            }
+
+            .toy-footer-column:nth-child(2) {
+                border-right: none;
+            }
+
+            .toy-footer-column:nth-child(3) {
+                padding-left: 0;
+            }
+        }
+
+        @@media (max-width: 550px) {
+            .toy-footer-main {
+                padding: 30px 20px;
+            }
+
+            .toy-footer-container {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .toy-footer-column {
+                padding: 0 0 22px !important;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,.4);
+            }
+
+                .toy-footer-column:last-child {
+                    padding-bottom: 0 !important;
+                    border-bottom: none;
+                }
+
+            .toy-footer-social {
+                padding: 22px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="toy-header">
+
+        <div class="toy-header-top">
+
+            <!-- LOGO -->
+            <a class="toy-logo"
+               href="@Url.Action("Index", "Home", new { area = "" })">
+                Toy<span>Store</span>
+            </a>
+
+            <!-- TÌM KIẾM -->
+            @using (Html.BeginForm(
+                "Search",
+                "Home",
+                new { area = "" },
+                FormMethod.Get,
+                new { @class = "toy-search" }))
+            {
+                <i class="fa-solid fa-magnifying-glass"
+                   aria-hidden="true"></i>
+
+                <input type="text"
+                       name="searchTerm"
+                       value="@(Request.QueryString["searchTerm"])"
+                       placeholder="Tìm kiếm..."
+                       aria-label="Tìm kiếm sản phẩm" />
+            }
+
+            <!-- HOTLINE, TÀI KHOẢN, GIỎ HÀNG -->
+        <div class="toy-header-actions">
+
+            <!-- HOTLINE -->
+            <a href="tel:18008123" aria-label="Gọi 18008123">
+                <i class="fa-solid fa-phone"></i>
+                <strong>18008123</strong>
+            </a>
+
+            <!-- KIỂM TRA ĐĂNG NHẬP -->
+            @if (User.Identity.IsAuthenticated)
+            {
+                <details class="toy-user-dropdown">
+
+                    <summary class="toy-user-summary">
+                        <i class="fa-regular fa-user"></i>
+
+                        <span class="user-name">
+                            @User.Identity.Name
+                        </span>
+
+                        <i class="fa-solid fa-chevron-down user-chevron"></i>
+                    </summary>
+
+                    <div class="toy-user-menu">
+
+                        <div class="toy-user-menu-title">
+                            Đang đăng nhập:
+                            <strong>@User.Identity.Name</strong>
+                        </div>
+
+                        @using (Html.BeginForm(
+                            "Logout",
+                            "Login",
+                            new { area = "" },
+                            FormMethod.Post,
+                            new { @class = "toy-logout-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit" class="toy-logout-button">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Đăng xuất tài khoản
+                            </button>
+                        }
+
+                    </div>
+                </details>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Login", new { area = "" })"
+                   title="Đăng nhập">
+
+                    <i class="fa-regular fa-user"></i>
+                </a>
+            }
+
+            <!-- GIỎ HÀNG -->
+            <a href="@Url.Action("Index", "Cart", new { area = "" })"
+               title="Giỏ hàng">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+
+        </div>
+        </div>
+
+        <!-- THANH DANH MỤC -->
+        <nav class="toy-category-nav" aria-label="Danh mục sản phẩm">
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Xe ô tô" })">Xe ô tô</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Moto" })">Moto</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Máy bay" })">Máy bay</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Gấu bông" })">Gấu bông</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Figure" })">Figure</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "LEGO" })">LEGO</a>
+
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Thẻ sưu tầm" })">Thẻ sưu tầm</a>
+
+        </nav>
+    </header>
+
+    <!-- NỘI DUNG CÁC TRANG -->
+    <main class="toy-page-content">
+        @RenderBody()
+        <footer class="toy-footer">
+
+            <!-- =================================
+             PHẦN SOCIAL
+             ================================= -->
+            <div class="toy-footer-social">
+
+                <h3 class="toy-footer-social-title">
+                    ✦ SOCIAL ✦
+                </h3>
+
+                <div class="toy-social-links">
+
+                    <a href="#"
+                       class="toy-social-facebook"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#"
+                       class="toy-social-instagram"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#"
+                       class="toy-social-youtube"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Youtube">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+
+                    <a href="#"
+                       class="toy-social-tiktok"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                </div>
+
+                <div class="toy-social-divider"></div>
+
+            </div>
+
+
+            <!-- =================================
+             PHẦN THÔNG TIN TOYSTORE
+             ================================= -->
+            <div class="toy-footer-main">
+
+                <div class="toy-footer-container">
+
+                    <!-- CỘT 1: THÔNG TIN CỬA HÀNG -->
+                    <div class="toy-footer-column">
+
+                        <div class="toy-footer-logo">
+                            Toy<span>Store</span>
+                        </div>
+
+                        <p class="toy-footer-intro">
+                            ToyStore - Cửa hàng chuyên cung cấp
+                            các sản phẩm đồ chơi, mô hình và
+                            bộ sưu tập dành cho mọi lứa tuổi.
+                        </p>
+
+                        <div class="toy-footer-info">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>
+                                Giờ hoạt động: Vui lòng cập nhật giờ mở cửa của ToyStore.
+                            </span>
+                        </div>
+
+                        <div class="toy-footer-info">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>
+                                Địa chỉ cửa hàng:
+                                Vui lòng cập nhật địa chỉ ToyStore.
+                            </span>
+                        </div>
+
+                        <div class="toy-footer-info">
+                            <i class="fa-solid fa-phone"></i>
+                            <span>
+                                Hotline:
+                                <a href="tel:18008123" style="color:#fff;">
+                                    18008123
+                                </a>
+                            </span>
+                        </div>
+
+                        <div class="toy-footer-info">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>
+                                Website:
+                                <a href="@Url.Action("Index", "Home")"
+                                   style="color:#fff;">
+                                    ToyStore
+                                </a>
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <!-- CỘT 2: THÔNG TIN CÔNG TY -->
+                    <div class="toy-footer-column">
+
+                        <h4 class="toy-footer-title">
+                            THÔNG TIN TOYSTORE
+                        </h4>
+
+                        <ul class="toy-footer-list">
+
+                            <li>
+                                <a href="@Url.Action("Index", "Home")">
+                                    Trang chủ
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="@Url.Action("Index", "Home")">
+                                    Giới thiệu ToyStore
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Thông tin liên hệ
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Hướng dẫn mua hàng
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                    <!-- CỘT 3: CHÍNH SÁCH -->
+                    <div class="toy-footer-column">
+
+                        <h4 class="toy-footer-title">
+                            CHÍNH SÁCH
+                        </h4>
+
+                        <ul class="toy-footer-list">
+
+                            <li>
+                                <a href="#">
+                                    Chính sách đổi trả hàng
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Chính sách vận chuyển
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Chính sách giao hàng
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Chính sách bảo mật
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                    <!-- CỘT 4: HỖ TRỢ KHÁCH HÀNG -->
+                    <div class="toy-footer-column">
+
+                        <h4 class="toy-footer-title">
+                            HỖ TRỢ KHÁCH HÀNG
+                        </h4>
+
+                        <ul class="toy-footer-list">
+
+                            <li>
+                                <a href="#">
+                                    Phương thức thanh toán
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Hướng dẫn đặt hàng
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Câu hỏi thường gặp
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Góp ý và khiếu nại
+                                </a>
+                            </li>
+
+                        </ul>
+
+                        <h4 class="toy-payment-title">
+                            PHƯƠNG THỨC THANH TOÁN
+                        </h4>
+
+                        <div class="toy-payment-list">
+
+                            <span class="toy-payment-item">COD</span>
+                            <span class="toy-payment-item">VISA</span>
+                            <span class="toy-payment-item">MASTER</span>
+                            <span class="toy-payment-item">VNPay</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+             PHẦN BẢN QUYỀN
+             ================================= -->
+            <div class="toy-footer-bottom">
+
+                <p>
+                    <strong>ToyStore</strong> - Cửa hàng đồ chơi và mô hình.
+                </p>
+
+                <p>
+                    Hotline hỗ trợ khách hàng: 18008123
+                </p>
+
+                <p>
+                    Copyright © @DateTime.Now.Year ToyStore.
+                    All rights reserved.
+                </p>
+
+            </div>
+
+        </footer>
+    </main>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

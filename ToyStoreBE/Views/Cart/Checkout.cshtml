@@ -1,0 +1,462 @@
+﻿@model ToyStoreBE.Models.MyModel.CheckOutVM
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .checkout-page {
+        max-width: 1200px;
+        margin: 25px auto 45px;
+        padding: 0 18px;
+        color: #333;
+    }
+
+    .checkout-title {
+        margin-bottom: 25px;
+    }
+
+        .checkout-title h2 {
+            margin: 0 0 8px;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .checkout-title p {
+            margin: 0;
+            color: #888;
+            font-size: 14px;
+        }
+
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .checkout-card {
+        margin-bottom: 20px;
+        padding: 23px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(0,0,0,.035);
+    }
+
+        .checkout-card h3 {
+            margin: 0 0 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+    .checkout-field {
+        margin-bottom: 17px;
+    }
+
+        .checkout-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #444;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .checkout-field input,
+        .checkout-field textarea {
+            display: block;
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            outline: none;
+            background: #fff;
+            font-size: 14px;
+            box-shadow: none;
+        }
+
+        .checkout-field input {
+            height: 44px;
+        }
+
+        .checkout-field textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+            .checkout-field input:focus,
+            .checkout-field textarea:focus {
+                border-color: #e53935;
+                box-shadow: 0 0 0 3px rgba(229,57,53,.08);
+            }
+
+    .checkout-error {
+        display: block;
+        margin-top: 5px;
+        color: #dc2626;
+        font-size: 12px;
+    }
+
+    .checkout-validation {
+        margin-bottom: 15px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    /* SẢN PHẨM */
+    .checkout-product {
+        display: grid;
+        grid-template-columns: 75px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+        .checkout-product:last-child {
+            border-bottom: none;
+        }
+
+        .checkout-product img {
+            width: 75px;
+            height: 75px;
+            padding: 5px;
+            border: 1px solid #eee;
+            border-radius: 7px;
+            object-fit: contain;
+            background: #fafafa;
+        }
+
+    .checkout-product-name {
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.45;
+    }
+
+    .checkout-product-meta {
+        color: #888;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .checkout-product-price {
+        color: #e53935;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .checkout-product-note {
+        margin-top: 5px;
+        color: #666;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    /* TỔNG TIỀN */
+    .checkout-summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #666;
+        font-size: 14px;
+    }
+
+        .checkout-summary-row strong {
+            color: #333;
+        }
+
+    .checkout-total {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 17px;
+        padding-top: 17px;
+        border-top: 1px solid #eee;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+        .checkout-total strong {
+            color: #e53935;
+            font-size: 22px;
+        }
+
+    .checkout-payment {
+        padding: 13px;
+        border: 1px solid #f1c4c2;
+        border-radius: 7px;
+        background: #fff7f6;
+        color: #b8322c;
+        font-size: 13px;
+    }
+
+        .checkout-payment i {
+            margin-right: 6px;
+        }
+
+    .checkout-submit {
+        width: 100%;
+        min-height: 48px;
+        margin-top: 20px;
+        border: none;
+        border-radius: 7px;
+        background: #e53935;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .checkout-submit:hover {
+            background: #c62828;
+        }
+
+    .checkout-back {
+        display: block;
+        margin-top: 14px;
+        color: #666;
+        text-align: center;
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+        .checkout-back:hover {
+            color: #e53935;
+        }
+
+    @@media(max-width: 850px) {
+        .checkout-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width: 500px) {
+        .checkout-page {
+            padding: 0 5px;
+        }
+
+        .checkout-card {
+            padding: 16px;
+        }
+
+        .checkout-product {
+            grid-template-columns: 65px minmax(0, 1fr);
+        }
+
+            .checkout-product img {
+                width: 65px;
+                height: 65px;
+            }
+
+        .checkout-product-price {
+            grid-column: 2;
+            text-align: left;
+        }
+    }
+</style>
+
+<div class="checkout-page">
+
+    <div class="checkout-title">
+        <h2>THANH TOÁN ĐƠN HÀNG</h2>
+        <p>Kiểm tra thông tin nhận hàng trước khi xác nhận đặt hàng.</p>
+    </div>
+
+    @using (Html.BeginForm("Checkout", "Cart", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(
+                      false,
+                      "",
+                      new { @class = "checkout-validation" }
+                  )
+
+        <div class="checkout-layout">
+
+            <!-- THÔNG TIN NGƯỜI NHẬN -->
+            <div>
+
+                <div class="checkout-card">
+
+                    <h3>
+                        <i class="fa-solid fa-user"></i>
+                        Thông tin nhận hàng
+                    </h3>
+
+                    <div class="checkout-field">
+                        @Html.LabelFor(m => m.CustomerName, "Họ và tên")
+
+                        @Html.TextBoxFor(m => m.CustomerName, new
+                        {
+                            placeholder = "Nhập họ tên người nhận"
+                        })
+
+                        @Html.ValidationMessageFor(
+                                      m => m.CustomerName,
+                                      "",
+                                      new { @class = "checkout-error" }
+                                  )
+                    </div>
+
+                    <div class="checkout-field">
+                        @Html.LabelFor(m => m.CustomerPhone, "Số điện thoại")
+
+                        @Html.TextBoxFor(m => m.CustomerPhone, new
+                        {
+                            placeholder = "Nhập số điện thoại",
+                            type = "tel",
+                            maxlength = "15"
+                        })
+
+                        @Html.ValidationMessageFor(
+                                      m => m.CustomerPhone,
+                                      "",
+                                      new { @class = "checkout-error" }
+                                  )
+                    </div>
+
+                    <div class="checkout-field">
+                        @Html.LabelFor(m => m.CustomerEmail, "Email")
+
+                        @Html.TextBoxFor(m => m.CustomerEmail, new
+                        {
+                            placeholder = "Nhập email",
+                            type = "email"
+                        })
+
+                        @Html.ValidationMessageFor(
+                                      m => m.CustomerEmail,
+                                      "",
+                                      new { @class = "checkout-error" }
+                                  )
+                    </div>
+
+                    <div class="checkout-field">
+                        @Html.LabelFor(m => m.CustomerAddress, "Địa chỉ nhận hàng")
+
+                        @Html.TextAreaFor(m => m.CustomerAddress, new
+                        {
+                            placeholder = "Nhập địa chỉ nhận hàng"
+                        })
+
+                        @Html.ValidationMessageFor(
+                                      m => m.CustomerAddress,
+                                      "",
+                                      new { @class = "checkout-error" }
+                                  )
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ĐƠN HÀNG -->
+            <div>
+
+                <div class="checkout-card">
+
+                    <h3>
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        Đơn hàng của bạn
+                    </h3>
+
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="checkout-product">
+
+                            <img src="@Url.Content(
+                                string.IsNullOrWhiteSpace(item.ProductImage)
+                                ? "~/Content/images/default_img.png"
+                                : item.ProductImage)"
+                                 alt="@item.ProductName" />
+
+                            <div>
+
+                                <div class="checkout-product-name">
+                                    @item.ProductName
+                                </div>
+
+                                <div class="checkout-product-meta">
+                                    Danh mục: @item.CategoryName
+                                    <br />
+                                    Đơn giá: @item.UnitPrice.ToString("N0") VNĐ
+                                    <br />
+                                    Số lượng: @item.Quantity
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Note))
+                                {
+                                    <div class="checkout-product-note">
+                                        Ghi chú: @item.Note
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div class="checkout-product-price">
+                                @item.TotalPrice.ToString("N0") VNĐ
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                <div class="checkout-card">
+
+                    <h3>Tổng thanh toán</h3>
+
+                    <div class="checkout-summary-row">
+                        <span>Số sản phẩm</span>
+                        <strong>@Model.TotalQuantity</strong>
+                    </div>
+
+                    <div class="checkout-summary-row">
+                        <span>Phương thức thanh toán</span>
+                        <strong>COD</strong>
+                    </div>
+
+                    <div class="checkout-total">
+                        <span>Tổng tiền</span>
+
+                        <strong>
+                            @Model.TotalAmount.ToString("N0") VNĐ
+                        </strong>
+                    </div>
+
+                    <div class="checkout-payment">
+                        <i class="fa-solid fa-truck"></i>
+                        Thanh toán khi nhận hàng (COD).
+                    </div>
+
+                    <button type="submit" class="checkout-submit">
+                        <i class="fa-solid fa-check"></i>
+                        XÁC NHẬN ĐẶT HÀNG
+                    </button>
+
+                    <a href="@Url.Action("Index", "Cart")"
+                       class="checkout-back">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Quay lại giỏ hàng
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

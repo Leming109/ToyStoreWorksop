@@ -1,0 +1,81 @@
+﻿@model ToyStoreBE.Models.MyModel.AdminUserCreateViewModel
+
+@{
+    ViewBag.Title = "Thêm quản trị viên";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+
+    <h2 class="mb-2">THÊM QUẢN TRỊ VIÊN</h2>
+    <p class="text-muted">Nhập thông tin tài khoản quản trị mới.</p>
+
+    <hr />
+
+    @using (Html.BeginForm("Create", "Users", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group mb-3">
+            @Html.LabelFor(m => m.Username)
+
+            @Html.TextBoxFor(m => m.Username,
+                new
+                {
+                    @class = "form-control",
+                    placeholder = "Nhập tên tài khoản",
+                    autocomplete = "off"
+                })
+
+            @Html.ValidationMessageFor(
+                m => m.Username, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group mb-3">
+            @Html.LabelFor(m => m.Password)
+
+            @Html.PasswordFor(m => m.Password,
+                new
+                {
+                    @class = "form-control",
+                    placeholder = "Nhập mật khẩu"
+                })
+
+            @Html.ValidationMessageFor(
+                m => m.Password, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group mb-4">
+            @Html.LabelFor(m => m.ConfirmPassword)
+
+            @Html.PasswordFor(m => m.ConfirmPassword,
+                new
+                {
+                    @class = "form-control",
+                    placeholder = "Nhập lại mật khẩu"
+                })
+
+            @Html.ValidationMessageFor(
+                m => m.ConfirmPassword, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Thêm tài khoản
+        </button>
+
+        @Html.ActionLink(
+            "Quay lại",
+            "Index",
+            "Users",
+            new { area = "Admin" },
+            new { @class = "btn btn-secondary ml-2" }
+        )
+    }
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
