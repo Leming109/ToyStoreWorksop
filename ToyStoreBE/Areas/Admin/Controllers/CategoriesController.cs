@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.UI;
 using ToyStoreBE.Models;
 using ToyStoreBE.Models.ViewModel;
+using System.Data.Entity.Infrastructure;
 
 namespace ToyStoreBE.Areas.Admin.Controllers
 {
@@ -83,12 +84,42 @@ namespace ToyStoreBE.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CategoryID,CategoryName")] Category category)
+        public ActionResult Create(Category category)
         {
+            //if (ModelState.IsValid)
+            //{
+            //    db.Categories.Add(category);
+            //    db.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
+
+            //return View(category);
+
+            if (category == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            if (category.CategoryName != null)
+                category.CategoryName = category.CategoryName.Trim();
+
             if (ModelState.IsValid)
             {
+                // Kiểm tra tên danh mục đã tồn tại
+                bool existed = db.Categories.Any(c =>
+                    c.CategoryName == category.CategoryName);
+
+                if (existed)
+                {
+                    ModelState.AddModelError(
+                        "CategoryName",
+                        "Tên danh mục này đã tồn tại.");
+
+                    return View(category);
+                }
+
                 db.Categories.Add(category);
                 db.SaveChanges();
+
+                TempData["Success"] = "Thêm danh mục thành công.";
                 return RedirectToAction("Index");
             }
 
@@ -117,16 +148,51 @@ namespace ToyStoreBE.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CategoryID,CategoryName")] Category category)
+        public ActionResult Edit(Category model)
         {
-            if (ModelState.IsValid)
-            {
-                db.Entry(category).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(category);
+            //if (ModelState.IsValid)
+            //{
+            //    db.Entry(category).State = EntityState.Modified;
+            //    db.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
+            //return View(category);
 
+
+            if (model == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            if (model.CategoryName != null)
+                model.CategoryName = model.CategoryName.Trim();
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var category = db.Categories.Find(model.CategoryID);
+
+            if (category == null)
+                return HttpNotFound();
+
+            bool existed = db.Categories.Any(c =>
+                c.CategoryName == model.CategoryName &&
+                c.CategoryID != model.CategoryID);
+
+            if (existed)
+            {
+                ModelState.AddModelError(
+                    "CategoryName",
+                    "Tên danh mục này đã được sử dụng.");
+
+                return View(model);
+            }
+
+            // Chỉ cập nhật tên danh mục
+            category.CategoryName = model.CategoryName;
+
+            db.SaveChanges();
+
+            TempData["Success"] = "Cập nhật danh mục thành công.";
+            return RedirectToAction("Index");
         }
 
         // GET: Admin/Categories/Delete/5
@@ -157,8 +223,9 @@ namespace ToyStoreBE.Areas.Admin.Controllers
                 return HttpNotFound();
             }
 
-            // Kiểm tra danh mục có sản phẩm hay không
-            bool hasProducts = db.Products.Any(p => p.CategoryID == id);
+            // Kiểm tra sản phẩm thuộc danh mục
+            bool hasProducts = db.Products.Any(p =>
+                p.CategoryID == id);
 
             if (hasProducts)
             {
@@ -168,10 +235,18 @@ namespace ToyStoreBE.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            db.Categories.Remove(category);
-            db.SaveChanges();
+            try
+            {
+                db.Categories.Remove(category);
+                db.SaveChanges();
 
-            TempData["Success"] = "Xóa danh mục thành công.";
+                TempData["Success"] = "Xóa danh mục thành công.";
+            }
+            catch (System.Data.Entity.Infrastructure.DbUpdateException)
+            {
+                TempData["Error"] =
+                    "Không thể xóa danh mục vì đang có dữ liệu liên quan.";
+            }
 
             return RedirectToAction("Index");
         }
