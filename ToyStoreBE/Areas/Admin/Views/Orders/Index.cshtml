@@ -1,58 +1,335 @@
 ﻿@model IEnumerable<ToyStoreBE.Models.Order>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Quản lý đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
 }
 
-<h2>Index</h2>
+<style>
+    .order-page {
+        padding: 20px 25px;
+        color: #1e293b;
+    }
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.OrderDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalAmount)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.PaymentStatus)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AddressDelivery)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Customer.CustomerName)
-        </th>
-        <th></th>
-    </tr>
+    .order-header {
+        margin-bottom: 25px;
+    }
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.OrderDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalAmount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PaymentStatus)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AddressDelivery)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Customer.CustomerName)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.OrderID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.OrderID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.OrderID })
-        </td>
-    </tr>
-}
+        .order-header h2 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
 
-</table>
+        .order-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    .order-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .04);
+    }
+
+    .order-card-top {
+        padding: 16px 20px;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+        .order-card-top h4 {
+            margin: 0;
+            color: #c0392b;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .order-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: collapse;
+    }
+
+        .order-table thead {
+            background: #f8fafc;
+        }
+
+        .order-table th {
+            padding: 15px 18px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .order-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .order-table tbody tr:hover {
+            background: #fffafa;
+        }
+
+        .order-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    .order-id {
+        color: #c0392b;
+        font-weight: 700;
+    }
+
+    .order-customer {
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .order-date {
+        color: #64748b;
+    }
+
+    .order-money {
+        color: #dc2626;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .order-status {
+        display: inline-block;
+        padding: 6px 11px;
+        color: #c0392b;
+        background: #fff1ef;
+        border: 1px solid #fecaca;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .btn-order-detail {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 8px 13px;
+        color: #fff;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: .2s;
+        white-space: nowrap;
+    }
+
+        .btn-order-detail:hover {
+            color: #fff;
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+
+    .order-empty {
+        padding: 45px 20px !important;
+        color: #94a3b8;
+        text-align: center;
+    }
+
+        .order-empty i {
+            display: block;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+            font-size: 35px;
+        }
+
+    .order-summary {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 20px;
+        color: #475569;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+        .order-summary strong {
+            color: #c0392b;
+            font-size: 16px;
+        }
+
+    @@media (max-width: 768px) {
+        .order-page {
+            padding: 15px 10px;
+        }
+
+        .order-header h2 {
+            font-size: 23px;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 12px 10px;
+        }
+    }
+</style>
+
+<div class="order-page">
+
+    <!-- HEADER -->
+    <div class="order-header">
+        <h2>QUẢN LÝ ĐƠN HÀNG</h2>
+        <p>Theo dõi và tra cứu các đơn hàng của khách hàng tại ToyStore.</p>
+    </div>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- TABLE -->
+    <div class="order-card">
+
+        <div class="order-card-top">
+            <h4>
+                <i class="fa-solid fa-receipt"></i>
+                &nbsp; Danh sách đơn hàng
+            </h4>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="order-table">
+
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    <span class="order-id">
+                                        #@item.OrderID
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-customer">
+                                        @(item.Customer != null
+                                            ? item.Customer.CustomerName
+                                            : "Không xác định")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-date">
+                                        @item.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-money">
+                                        @item.TotalAmount.ToString("N0") đ
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="order-status">
+                                        @(string.IsNullOrWhiteSpace(item.PaymentStatus)
+                                            ? "Chưa cập nhật"
+                                            : item.PaymentStatus)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @Html.ActionLink(
+                                        "Chi tiết",
+                                        "Details",
+                                        "Orders",
+                                        new
+                                        {
+                                            area = "Admin",
+                                            id = item.OrderID
+                                        },
+                                        new
+                                        {
+                                            @class = "btn-order-detail"
+                                        }
+                                    )
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="order-empty">
+                                <i class="fa-solid fa-box-open"></i>
+                                Chưa có đơn hàng nào trong hệ thống.
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="order-summary">
+
+            <span>
+                Tổng số đơn hàng:
+                <strong>@(Model == null ? 0 : Model.Count())</strong>
+            </span>
+
+            <span>
+                Tổng giá trị đơn hàng:
+                <strong>
+                    @(Model == null
+                        ? "0"
+                        : Model.Sum(o => o.TotalAmount).ToString("N0")) đ
+                </strong>
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
