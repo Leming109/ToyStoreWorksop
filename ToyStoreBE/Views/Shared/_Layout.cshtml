@@ -76,6 +76,27 @@
                 box-shadow: none;
             }
 
+            .toy-search button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 auto;
+                padding: 0;
+                border: none;
+                background: transparent;
+                cursor: pointer;
+            }
+
+                .toy-search button i {
+                    margin-right: 16px;
+                    color: #263746;
+                    font-size: 24px;
+                }
+
+                .toy-search button:hover i {
+                    color: #f44336;
+                }
+
         /* KHU VỰC HOTLINE, USER, GIỎ HÀNG */
         .toy-header-actions {
             display: flex;
@@ -170,6 +191,29 @@
         .toy-logout-form {
             margin: 8px 0 0;
         }
+        /* NÚT THÔNG TIN CÁ NHÂN */
+        .toy-profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 9px;
+            border-radius: 6px;
+            color: #333;
+            font-size: 14px;
+            text-decoration: none !important;
+            transition: background .2s;
+        }
+
+            .toy-profile-link i {
+                color: #f44336;
+                font-size: 16px;
+            }
+
+            .toy-profile-link:hover {
+                background: #fff1f1;
+                color: #e53935;
+            }
 
         .toy-logout-button {
             display: flex;
@@ -298,6 +342,7 @@
                 padding: 18px 12px;
             }
         }
+
         .toy-footer {
             width: 100%;
             margin-top: 0;
@@ -564,106 +609,125 @@
 
             <!-- TÌM KIẾM -->
             @using (Html.BeginForm(
-                "Search",
+                "Index",
                 "Home",
                 new { area = "" },
                 FormMethod.Get,
                 new { @class = "toy-search" }))
             {
-                <i class="fa-solid fa-magnifying-glass"
-                   aria-hidden="true"></i>
+                <button type="submit" aria-label="Tìm kiếm">
+                    <i class="fa-solid fa-magnifying-glass"
+                       aria-hidden="true"></i>
+                </button>
 
                 <input type="text"
                        name="searchTerm"
-                       value="@(Request.QueryString["searchTerm"])"
-                       placeholder="Tìm kiếm..."
+                       value="@Request.QueryString["searchTerm"]"
+                       placeholder="Tìm kiếm sản phẩm..."
                        aria-label="Tìm kiếm sản phẩm" />
             }
 
             <!-- HOTLINE, TÀI KHOẢN, GIỎ HÀNG -->
-        <div class="toy-header-actions">
+            <div class="toy-header-actions">
 
-            <!-- HOTLINE -->
-            <a href="tel:18008123" aria-label="Gọi 18008123">
-                <i class="fa-solid fa-phone"></i>
-                <strong>18008123</strong>
-            </a>
-
-            <!-- KIỂM TRA ĐĂNG NHẬP -->
-            @if (User.Identity.IsAuthenticated)
-            {
-                <details class="toy-user-dropdown">
-
-                    <summary class="toy-user-summary">
-                        <i class="fa-regular fa-user"></i>
-
-                        <span class="user-name">
-                            @User.Identity.Name
-                        </span>
-
-                        <i class="fa-solid fa-chevron-down user-chevron"></i>
-                    </summary>
-
-                    <div class="toy-user-menu">
-
-                        <div class="toy-user-menu-title">
-                            Đang đăng nhập:
-                            <strong>@User.Identity.Name</strong>
-                        </div>
-
-                        @using (Html.BeginForm(
-                            "Logout",
-                            "Login",
-                            new { area = "" },
-                            FormMethod.Post,
-                            new { @class = "toy-logout-form" }))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <button type="submit" class="toy-logout-button">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                                Đăng xuất tài khoản
-                            </button>
-                        }
-
-                    </div>
-                </details>
-            }
-            else
-            {
-                <a href="@Url.Action("Login", "Login", new { area = "" })"
-                   title="Đăng nhập">
-
-                    <i class="fa-regular fa-user"></i>
+                <!-- HOTLINE -->
+                <a href="tel:18008123" aria-label="Gọi 18008123">
+                    <i class="fa-solid fa-phone"></i>
+                    <strong>18008123</strong>
                 </a>
-            }
 
-            <!-- GIỎ HÀNG -->
-            <a href="@Url.Action("Index", "Cart", new { area = "" })"
-               title="Giỏ hàng">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </a>
+                <!-- KIỂM TRA ĐĂNG NHẬP -->
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <details class="toy-user-dropdown">
 
-        </div>
+                        <summary class="toy-user-summary">
+                            <i class="fa-regular fa-user"></i>
+
+                            <span class="user-name">
+                                @User.Identity.Name
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down user-chevron"></i>
+                        </summary>
+
+                        <div class="toy-user-menu">
+
+                            <!-- THÔNG TIN TÀI KHOẢN -->
+                            <div class="toy-user-menu-title">
+                                Đang đăng nhập:
+                                <strong>@User.Identity.Name</strong>
+                            </div>
+
+                            <!-- THÔNG TIN CÁ NHÂN -->
+                            <a href="@Url.Action("InfoProfile", "Login", new { area = "" })"
+                               class="toy-profile-link">
+
+                                <i class="fa-solid fa-id-card"></i>
+
+                                <span>Thông tin cá nhân</span>
+
+                            </a>
+
+                            <!-- LỊCH SỬ GIAO DỊCH -->
+                            <a href="@Url.Action("Index","OrderHistory",new { area = "" })"
+                               class="toy-profile-link">
+
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                                <span>Lịch sử giao dịch</span>
+
+                            </a>
+
+                            <!-- ĐĂNG XUẤT -->
+                            @using (Html.BeginForm(
+                                "Logout",
+                                "Login",
+                                new { area = "" },
+                                FormMethod.Post,
+                                new { @class = "toy-logout-form" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="toy-logout-button">
+
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                                    Đăng xuất tài khoản
+
+                                </button>
+                            }
+
+                        </div>
+                    </details>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Login", new { area = "" })"
+                       title="Đăng nhập">
+
+                        <i class="fa-regular fa-user"></i>
+                    </a>
+                }
+
+                <!-- GIỎ HÀNG -->
+                <a href="@Url.Action("Index", "Cart", new { area = "" })"
+                   title="Giỏ hàng">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+
+            </div>
         </div>
 
         <!-- THANH DANH MỤC -->
         <nav class="toy-category-nav" aria-label="Danh mục sản phẩm">
-
-            <a href="@Url.Action("Index", "Home", new { area = "", category = "Xe ô tô" })">Xe ô tô</a>
-
-            <a href="@Url.Action("Index", "Home", new { area = "", category = "Moto" })">Moto</a>
-
-            <a href="@Url.Action("Index", "Home", new { area = "", category = "Máy bay" })">Máy bay</a>
-
-            <a href="@Url.Action("Index", "Home", new { area = "", category = "Gấu bông" })">Gấu bông</a>
-
             <a href="@Url.Action("Index", "Home", new { area = "", category = "Figure" })">Figure</a>
-
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Gấu bông" })">Gấu bông</a>
             <a href="@Url.Action("Index", "Home", new { area = "", category = "LEGO" })">LEGO</a>
-
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Máy bay" })">Máy bay</a>
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Mô tô" })">Mô tô</a>
             <a href="@Url.Action("Index", "Home", new { area = "", category = "Thẻ sưu tầm" })">Thẻ sưu tầm</a>
-
+            <a href="@Url.Action("Index", "Home", new { area = "", category = "Xe ô tô" })">Xe ô tô</a>
         </nav>
     </header>
 

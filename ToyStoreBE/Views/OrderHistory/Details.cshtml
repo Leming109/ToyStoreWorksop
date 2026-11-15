@@ -1,0 +1,142 @@
+﻿@model ToyStoreBE.Models.Order
+
+@{
+    ViewBag.Title = "Hóa đơn mua hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .customer-invoice-page {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 0 15px 35px;
+    }
+
+    .invoice-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        max-width: 950px;
+        margin: 0 auto 20px;
+    }
+
+    .invoice-toolbar-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .invoice-customer-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .invoice-customer-back {
+        color: #475569;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+    }
+
+        .invoice-customer-back:hover {
+            color: #c0392b;
+            background: #fff1ef;
+            border-color: #fecaca;
+        }
+
+    .invoice-customer-print {
+        color: #fff;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
+    }
+
+        .invoice-customer-print:hover {
+            color: #fff;
+            background: #c0392b;
+        }
+
+    @@media print {
+        .toy-header,
+        .toy-footer,
+        .invoice-toolbar {
+            display: none !important;
+        }
+
+        .toy-page-content {
+            min-height: auto !important;
+            padding: 0 !important;
+            background: #fff !important;
+        }
+
+        .customer-invoice-page {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .order-invoice-card {
+            max-width: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .order-invoice-content {
+            padding: 10px 0 !important;
+        }
+
+        .order-invoice-table tr {
+            page-break-inside: avoid;
+        }
+
+        .order-invoice-top {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+
+<div class="customer-invoice-page">
+
+    <div class="invoice-toolbar">
+
+        @Html.ActionLink(
+                 "Quay lại lịch sử giao dịch",
+                 "Index",
+                 "OrderHistory",
+                 new { area = "" },
+                 new { @class = "invoice-customer-btn invoice-customer-back" }
+             )
+
+        <div class="invoice-toolbar-buttons">
+
+            <button type="button"
+                    class="invoice-customer-btn invoice-customer-print"
+                    onclick="window.print()">
+
+                <i class="fa-solid fa-print"></i>
+                In hóa đơn
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- GỌI PARTIAL VIEW HÓA ĐƠN DÙNG CHUNG -->
+    @Html.Partial(
+            "~/Views/Shared/_OrderInvoice.cshtml",
+            Model
+        )
+
+</div>

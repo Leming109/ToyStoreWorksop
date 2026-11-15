@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿
+using System;
 using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Web;
 using System.Web.Mvc;
 using ToyStoreBE.Helpers;
 using ToyStoreBE.Models;
@@ -13,273 +8,217 @@ using ToyStoreBE.Models.MyModel;
 
 namespace ToyStoreBE.Areas.Admin.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController : AdminBaseController
     {
         private ToyStoreBEEntities db = new ToyStoreBEEntities();
 
+        // Chỉ SuperAdmin được quản lý tài khoản
+        protected override bool SuperAdminOnly
+        {
+            get { return true; }
+        }
+
+        // Cho Moderator vào Index để xem thông báo không có quyền
+        protected override bool AllowModeratorToViewIndexOnly
+        {
+            get { return true; }
+        }
+
+        // =========================================
         // GET: Admin/Users
+        // =========================================
         public ActionResult Index()
         {
+            // Moderator chỉ được xem giao diện thông báo.
+            // Không truy vấn và không gửi dữ liệu tài khoản xuống View.
+            if (ViewBag.AdminRole as string == "M")
+            {
+                return View(new System.Collections.Generic.List<User>());
+            }
+
+            // SuperAdmin xem cả tài khoản A và M
             var users = db.Users
-       .Where(u => u.UserRole == "A")
-       .OrderBy(u => u.Username)
-       .ToList();
+                .Where(u => u.UserRole == "A" || u.UserRole == "M")
+                .OrderBy(u => u.UserRole)
+                .ThenBy(u => u.Username)
+                .ToList();
 
             return View(users);
         }
 
-        // GET: Admin/Users/Details/5
-        public ActionResult Details(string id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            User user = db.Users.Find(id);
-            if (user == null)
-            {
-                return HttpNotFound();
-            }
-            return View(user);
-        }
-
+        // =========================================
         // GET: Admin/Users/Create
+        // =========================================
         public ActionResult Create()
         {
-            return View();
+            return View(new AdminUserCreateViewModel());
         }
 
+        // =========================================
         // POST: Admin/Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        // =========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(AdminUserCreateViewModel model)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    db.Users.Add(user);
-            //    db.SaveChanges();
-            //    return RedirectToAction("Index");
-            //}
-
-            //return View(user);
+            if (model == null)
+            {
+                return new HttpStatusCodeResult(400);
+            }
 
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
-            string username = model.Username.Trim();
+            string username = (model.Username ?? "").Trim();
 
-            // Kiểm tra tên tài khoản đã tồn tại
-            bool existed = db.Users.Any(u => u.Username == username);
+            // Kiểm tra tên tài khoản
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                ModelState.AddModelError(
+                    "Username",
+                    "Vui lòng nhập tên tài khoản."
+                );
+
+                return View(model);
+            }
+
+            if (username.Length > 255)
+            {
+                ModelState.AddModelError(
+                    "Username",
+                    "Tên tài khoản không được vượt quá 255 ký tự."
+                );
+
+                return View(model);
+            }
+
+            // Kiểm tra tài khoản đã tồn tại
+            bool existed = db.Users.Any(
+                u => u.Username == username
+            );
 
             if (existed)
             {
                 ModelState.AddModelError(
                     "Username",
-                    "Tên tài khoản này đã tồn tại.");
+                    "Tên tài khoản này đã tồn tại."
+                );
 
                 return View(model);
             }
 
-            // Mã hóa mật khẩu trước khi lưu
+            // Kiểm tra mật khẩu
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                ModelState.AddModelError(
+                    "Password",
+                    "Vui lòng nhập mật khẩu."
+                );
+
+                return View(model);
+            }
+
+            // Mã hóa mật khẩu
             string hashedPassword =
                 CompactPasswordHasher.HashPassword(model.Password);
 
-            // Password trong database là NCHAR(50)
+            // Database hiện đang dùng NCHAR(50)
             if (hashedPassword.Length > 50)
             {
                 ModelState.AddModelError(
                     "",
-                    "Mật khẩu sau khi mã hóa vượt quá độ dài cho phép.");
+                    "Mật khẩu sau khi mã hóa vượt quá độ dài cho phép."
+                );
 
                 return View(model);
             }
 
+            // LUÔN tạo Moderator, không nhận Role từ form
             User user = new User
             {
                 Username = username,
                 Password = hashedPassword,
-                UserRole = "A"
+                UserRole = "M",
+                IsLocked = false
             };
 
             db.Users.Add(user);
             db.SaveChanges();
 
-            TempData["Success"] = "Thêm tài khoản quản trị thành công.";
+            TempData["Success"] =
+                "Tạo tài khoản Moderator thành công.";
 
             return RedirectToAction("Index");
         }
 
-        // GET: Admin/Users/Edit/5
-        public ActionResult Edit(string id)
-        {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-            //User user = db.Users.Find(id);
-            //if (user == null)
-            //{
-            //    return HttpNotFound();
-            //}
-            //return View(user);
-
-            if (string.IsNullOrWhiteSpace(id))
-                return HttpNotFound();
-
-            id = id.Trim();
-
-            var user = db.Users.FirstOrDefault(u =>
-                u.Username == id && u.UserRole == "A");
-
-            if (user == null)
-                return HttpNotFound();
-
-            var model = new AdminUserEditViewModel
-            {
-                Username = user.Username.TrimEnd()
-            };
-
-            return View(model);
-        }
-
-        // POST: Admin/Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        // =========================================
+        // POST: Admin/Users/ToggleLock
+        // Khóa / Mở khóa Moderator
+        // =========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(string id, AdminUserEditViewModel model)
+        public ActionResult ToggleLock(string id)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    db.Entry(user).State = EntityState.Modified;
-            //    db.SaveChanges();
-            //    return RedirectToAction("Index");
-            //}
-            //return View(user);
-
-            if (string.IsNullOrWhiteSpace(id) || model == null)
-                return HttpNotFound();
-
-            id = id.Trim();
-            model.Username = id;
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var user = db.Users.FirstOrDefault(u =>
-                u.Username == id && u.UserRole == "A");
-
-            if (user == null)
-                return HttpNotFound();
-
-            // Chỉ đổi mật khẩu khi người dùng nhập mật khẩu mới
-            if (!string.IsNullOrWhiteSpace(model.NewPassword))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                string hashedPassword =
-                    CompactPasswordHasher.HashPassword(model.NewPassword);
-
-                if (hashedPassword.Length > 50)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Mật khẩu sau khi mã hóa vượt quá độ dài cho phép.");
-
-                    return View(model);
-                }
-
-                user.Password = hashedPassword;
+                return new HttpStatusCodeResult(400);
             }
 
-            db.SaveChanges();
-
-            TempData["Success"] = "Cập nhật tài khoản quản trị thành công.";
-
-            return RedirectToAction("Index");
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        // GET: Admin/Users/Delete/5
-        public ActionResult Delete(string id)
-        {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-            //User user = db.Users.Find(id);
-            //if (user == null)
-            //{
-            //    return HttpNotFound();
-            //}
-            //return View(user);
-
-            if (string.IsNullOrWhiteSpace(id))
-                return HttpNotFound();
-
             id = id.Trim();
 
+            // Chỉ tìm tài khoản Moderator.
+            // Không thể thao tác lên tài khoản SuperAdmin.
             var user = db.Users.FirstOrDefault(u =>
-                u.Username == id && u.UserRole == "A");
+                u.Username == id &&
+                u.UserRole == "M"
+            );
 
             if (user == null)
-                return HttpNotFound();
+            {
+                TempData["Error"] =
+                    "Không tìm thấy tài khoản Moderator hợp lệ.";
 
-            // Không cho phép tự xóa tài khoản đang đăng nhập
+                return RedirectToAction("Index");
+            }
+
+            // Không cho phép tự khóa tài khoản đang đăng nhập
             string currentUsername = User.Identity.Name ?? "";
 
             if (string.Equals(
-                user.Username.Trim(),
+                user.Username.TrimEnd(),
                 currentUsername.Trim(),
                 StringComparison.OrdinalIgnoreCase))
             {
                 TempData["Error"] =
-                    "Bạn không thể xóa tài khoản quản trị đang đăng nhập.";
+                    "Bạn không thể khóa tài khoản đang đăng nhập.";
 
                 return RedirectToAction("Index");
             }
 
-            // Không cho phép xóa tài khoản quản trị cuối cùng
-            int adminCount = db.Users.Count(u => u.UserRole == "A");
+            // Đảo trạng thái khóa
+            user.IsLocked = !user.IsLocked;
 
-            if (adminCount <= 1)
-            {
-                TempData["Error"] =
-                    "Hệ thống phải có ít nhất một tài khoản quản trị.";
-
-                return RedirectToAction("Index");
-            }
-
-            db.Users.Remove(user);
             db.SaveChanges();
 
-            TempData["Success"] = "Xóa tài khoản quản trị thành công.";
+            TempData["Success"] = user.IsLocked
+                ? "Đã khóa tài khoản Moderator thành công."
+                : "Đã mở khóa tài khoản Moderator thành công.";
 
             return RedirectToAction("Index");
         }
 
-
-
-
-        // POST: Admin/Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
-        {
-            User user = db.Users.Find(id);
-            db.Users.Remove(user);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
+        // =========================================
+        // DISPOSE
+        // =========================================
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

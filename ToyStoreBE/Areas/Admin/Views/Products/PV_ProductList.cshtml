@@ -3,13 +3,12 @@
 @using System.Globalization;
 
 @{
-    ViewBag.Title = "Danh Sách Sản Phẩm";
-
+    ViewBag.Title = "Danh sách sản phẩm";
     var culture = CultureInfo.GetCultureInfo("vi-VN");
 }
 
 <style>
-    /* Tổng thể */
+    /* TỔNG THỂ */
     .product-list-container {
         padding: 24px;
         background: #ffffff;
@@ -41,13 +40,14 @@
         margin-top: 6px;
     }
 
-    /* Nút thêm sản phẩm */
+    /* NÚT THÊM SẢN PHẨM */
     .btn-add-product {
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
         padding: 10px 18px;
-        background: #2563eb;
+        background: #e74c3c;
         color: #ffffff !important;
         border-radius: 8px;
         text-decoration: none !important;
@@ -56,11 +56,11 @@
     }
 
         .btn-add-product:hover {
-            background: #1d4ed8;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+            background: #c0392b;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
         }
 
-    /* Bảng sản phẩm */
+    /* BẢNG SẢN PHẨM */
     .product-table-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -68,27 +68,27 @@
 
     .product-table {
         width: 100%;
-        min-width: 800px;
+        min-width: 950px;
         border-collapse: separate;
         border-spacing: 0;
         margin-bottom: 0;
     }
 
         .product-table thead th {
-            background: #f1f5f9;
-            color: #475569;
+            background: #fff1ef;
+            color: #9f3027;
             font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
             padding: 16px 14px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #fecaca;
             white-space: nowrap;
         }
 
         .product-table tbody td {
             padding: 16px 14px;
             vertical-align: middle;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #f1f5f9;
             color: #334155;
         }
 
@@ -97,13 +97,13 @@
         }
 
         .product-table tbody tr:hover {
-            background: #f8fafc;
+            background: #fffafa;
         }
 
-    /* Hình ảnh */
+    /* HÌNH ẢNH */
     .product-image-box {
-        width: 100px;
-        height: 100px;
+        width: 90px;
+        height: 90px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -127,15 +127,16 @@
         padding: 5px;
     }
 
-    /* Tên sản phẩm */
+    /* TÊN SẢN PHẨM */
     .product-name {
         font-weight: 600;
         color: #1e293b;
         font-size: 15px;
         min-width: 180px;
+        max-width: 260px;
     }
 
-    /* Giá tiền */
+    /* GIÁ TIỀN */
     .product-price {
         font-weight: 700;
         color: #dc2626;
@@ -143,19 +144,41 @@
         font-size: 15px;
     }
 
-    /* Danh mục */
+    /* SỐ LƯỢNG TỒN */
+    .product-stock {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        padding: 6px 12px;
+        color: #15803d;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .product-stock-empty {
+        color: #dc2626;
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    /* DANH MỤC */
     .product-category {
         display: inline-block;
         padding: 6px 12px;
-        background: #eff6ff;
-        color: #2563eb;
+        background: #fff1ef;
+        color: #c0392b;
+        border: 1px solid #fecaca;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
     }
 
-    /* Nhóm nút thao tác */
+    /* THAO TÁC */
     .product-actions {
         display: flex;
         align-items: center;
@@ -177,17 +200,20 @@
         }
 
     .btn-edit-product {
-        background: #eff6ff;
-        color: #2563eb !important;
+        background: #fff1ef;
+        color: #c0392b !important;
+        border: 1px solid #fecaca;
     }
 
         .btn-edit-product:hover {
-            background: #dbeafe;
+            background: #e74c3c;
+            color: #fff !important;
         }
 
     .btn-detail-product {
         background: #f1f5f9;
         color: #475569 !important;
+        border: 1px solid #e2e8f0;
     }
 
         .btn-detail-product:hover {
@@ -197,13 +223,15 @@
     .btn-delete-product {
         background: #fef2f2;
         color: #dc2626 !important;
+        border: 1px solid #fecaca;
     }
 
         .btn-delete-product:hover {
-            background: #fee2e2;
+            background: #dc2626;
+            color: #fff !important;
         }
 
-    /* Trạng thái không có sản phẩm */
+    /* KHÔNG CÓ SẢN PHẨM */
     .product-empty {
         padding: 50px 20px;
         text-align: center;
@@ -219,7 +247,7 @@
             margin-bottom: 10px;
         }
 
-    /* Phân trang */
+    /* PHÂN TRANG */
     .product-pagination {
         display: flex;
         justify-content: center;
@@ -241,10 +269,16 @@
                 color: #475569;
             }
 
+                .product-pagination .pagination > li > a:hover {
+                    color: #c0392b;
+                    border-color: #f5b7b1;
+                    background: #fff1ef;
+                }
+
             .product-pagination .pagination > .active > a,
             .product-pagination .pagination > .active > span {
-                background: #2563eb;
-                border-color: #2563eb;
+                background: #e74c3c;
+                border-color: #e74c3c;
                 color: #ffffff;
             }
 
@@ -265,15 +299,16 @@
 
 <div class="product-list-container">
 
-    <!-- Tiêu đề -->
+    <!-- TIÊU ĐỀ -->
     <div class="product-list-header">
+
         <div>
             <h2 class="product-list-title">
                 Danh sách sản phẩm
             </h2>
 
             <div class="product-list-subtitle">
-                Quản lý thông tin và giá bán sản phẩm
+                Quản lý hình ảnh, giá bán, số lượng tồn và danh mục sản phẩm.
             </div>
         </div>
 
@@ -281,14 +316,15 @@
                  "＋ Thêm sản phẩm",
                  "Create",
                  "Products",
-                 null,
+                 new { area = "Admin" },
                  new { @class = "btn-add-product" }
              )
+
     </div>
 
     @if (Model.Products != null && Model.Products.Any())
     {
-        <!-- Bảng sản phẩm -->
+        <!-- BẢNG SẢN PHẨM -->
         <div class="product-table-wrapper">
 
             <table class="product-table">
@@ -298,17 +334,19 @@
                         <th>Hình ảnh</th>
                         <th>Tên sản phẩm</th>
                         <th>Giá bán</th>
+                        <th>Số lượng tồn</th>
                         <th>Danh mục</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
 
                 <tbody>
+
                     @foreach (var item in Model.Products)
                     {
                         <tr>
 
-                            <!-- Hình ảnh -->
+                            <!-- HÌNH ẢNH -->
                             <td>
                                 <div class="product-image-box">
 
@@ -327,14 +365,14 @@
                                 </div>
                             </td>
 
-                            <!-- Tên sản phẩm -->
+                            <!-- TÊN SẢN PHẨM -->
                             <td>
                                 <div class="product-name">
                                     @item.ProductName
                                 </div>
                             </td>
 
-                            <!-- Giá bán VND -->
+                            <!-- GIÁ BÁN -->
                             <td>
                                 <span class="product-price">
                                     @string.Format(
@@ -345,7 +383,23 @@
                                 </span>
                             </td>
 
-                            <!-- Danh mục -->
+                            <!-- SỐ LƯỢNG TỒN -->
+                            <td>
+                                @if (item.StockQuantity > 0)
+                                {
+                                    <span class="product-stock">
+                                        @item.StockQuantity
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="product-stock product-stock-empty">
+                                        Hết hàng
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- DANH MỤC -->
                             <td>
                                 @if (item.Category != null)
                                 {
@@ -359,29 +413,53 @@
                                 }
                             </td>
 
-                            <!-- Thao tác -->
+                            <!-- THAO TÁC -->
                             <td>
                                 <div class="product-actions">
 
                                     @Html.ActionLink(
                                              "Sửa",
-                                             "Edit","Products",
-                                             new { id = item.ProductID },
-                                             new { @class = "btn-edit-product" }
+                                             "Edit",
+                                             "Products",
+                                             new
+                                             {
+                                                 area = "Admin",
+                                                 id = item.ProductID
+                                             },
+                                             new
+                                             {
+                                                 @class = "btn-edit-product"
+                                             }
                                          )
 
                                     @Html.ActionLink(
                                              "Chi tiết",
                                              "Details",
-                                             new { id = item.ProductID },
-                                             new { @class = "btn-detail-product" }
+                                             "Products",
+                                             new
+                                             {
+                                                 area = "Admin",
+                                                 id = item.ProductID
+                                             },
+                                             new
+                                             {
+                                                 @class = "btn-detail-product"
+                                             }
                                          )
 
                                     @Html.ActionLink(
                                              "Xóa",
-                                             "Delete","Products",
-                                             new { id = item.ProductID },
-                                             new { @class = "btn-delete-product" }
+                                             "Delete",
+                                             "Products",
+                                             new
+                                             {
+                                                 area = "Admin",
+                                                 id = item.ProductID
+                                             },
+                                             new
+                                             {
+                                                 @class = "btn-delete-product"
+                                             }
                                          )
 
                                 </div>
@@ -389,20 +467,22 @@
 
                         </tr>
                     }
+
                 </tbody>
 
             </table>
 
         </div>
 
-        <!-- Phân trang -->
+        <!-- PHÂN TRANG -->
         <div class="product-pagination">
 
             @Html.PagedListPager(
                      Model.Products,
-                     page => Url.Action("Index", new
+                     page => Url.Action("Index", "Products", new
                      {
-                         page,
+                         area = "Admin",
+                         page = page,
                          searchTerm = Model.SearchTerm,
                          minPrice = Model.MinPrice,
                          maxPrice = Model.MaxPrice,
@@ -414,7 +494,7 @@
     }
     else
     {
-        <!-- Không tìm thấy sản phẩm -->
+        <!-- KHÔNG CÓ SẢN PHẨM -->
         <div class="product-empty">
 
             <h4>Không tìm thấy sản phẩm</h4>
@@ -424,10 +504,10 @@
             </p>
 
             @Html.ActionLink(
-                     "Thêm sản phẩm mới",
+                     "＋ Thêm sản phẩm mới",
                      "Create",
                      "Products",
-                     null,
+                     new { area = "Admin" },
                      new { @class = "btn-add-product" }
                  )
 

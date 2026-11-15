@@ -8,7 +8,7 @@ using ToyStoreBE.Models.MyModel;
 
 namespace ToyStoreBE.Areas.Admin.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : AdminBaseController
     {
         private ToyStoreBEEntities db = new ToyStoreBEEntities();
 

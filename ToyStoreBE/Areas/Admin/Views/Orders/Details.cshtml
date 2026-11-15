@@ -1,332 +1,354 @@
-﻿@model ToyStoreBE.Models.Order
+﻿
+@model ToyStoreBE.Models.Order
+
+@using System
+@using System.Linq
+@using System.Collections.Generic
+@using System.Web.Mvc
 
 @{
-    ViewBag.Title = "Chi tiết hóa đơn";
+    ViewBag.Title = "Chi tiết đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    string currentStatus = string.IsNullOrWhiteSpace(Model.OrderStatus)
+        ? "Chờ xác nhận"
+        : Model.OrderStatus.Trim();
+
+    var nextStatuses = ViewBag.NextStatuses as IEnumerable<SelectListItem>
+        ?? Enumerable.Empty<SelectListItem>();
+
+    string[] statusSteps =
+    {
+        "Chờ xác nhận",
+        "Đã xác nhận",
+        "Đang chuẩn bị hàng",
+        "Đang giao hàng",
+        "Đã giao hàng"
+    };
+
+    int currentStep = Array.IndexOf(statusSteps, currentStatus);
+
+    string statusClass = "pending";
+    string statusIcon = "fa-clock";
+
+    switch (currentStatus)
+    {
+        case "Đã xác nhận":
+            statusClass = "confirmed";
+            statusIcon = "fa-circle-check";
+            break;
+
+        case "Đang chuẩn bị hàng":
+            statusClass = "preparing";
+            statusIcon = "fa-box";
+            break;
+
+        case "Đang giao hàng":
+            statusClass = "shipping";
+            statusIcon = "fa-truck";
+            break;
+
+        case "Đã giao hàng":
+            statusClass = "delivered";
+            statusIcon = "fa-check-double";
+            break;
+
+        case "Đã hủy":
+            statusClass = "cancelled";
+            statusIcon = "fa-ban";
+            break;
+    }
 }
 
 <style>
-    .invoice-page {
-        padding: 20px 25px;
-        color: #1e293b;
+    .admin-order-detail-page {
+        padding: 20px 15px;
     }
 
-    .invoice-actions {
+    /* TOOLBAR */
+    .admin-order-toolbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
         flex-wrap: wrap;
+        gap: 12px;
         max-width: 950px;
         margin: 0 auto 20px;
     }
 
-    .invoice-action-right {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .invoice-btn {
+    .admin-order-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 10px 17px;
-        border-radius: 7px;
+        padding: 10px 18px;
+        border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
         text-decoration: none !important;
-        border: 1px solid transparent;
         cursor: pointer;
-        transition: .2s;
     }
 
-    .invoice-btn-back {
+    .admin-order-back {
         color: #475569;
         background: #fff;
-        border-color: #cbd5e1;
+        border: 1px solid #cbd5e1;
     }
 
-        .invoice-btn-back:hover {
+        .admin-order-back:hover {
             color: #334155;
             background: #f1f5f9;
         }
 
-    .invoice-btn-print {
+    .admin-order-print {
         color: #fff;
         background: #e74c3c;
-        border-color: #e74c3c;
+        border: 1px solid #e74c3c;
     }
 
-        .invoice-btn-print:hover {
+        .admin-order-print:hover {
             color: #fff;
             background: #c0392b;
         }
 
-    .invoice-card {
-        position: relative;
+    /* STATUS CARD */
+    .order-status-management {
         max-width: 950px;
-        margin: 0 auto;
-        overflow: hidden;
+        margin: 0 auto 24px;
+        padding: 25px;
         background: #fff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(15, 23, 42, .06);
+        border-radius: 13px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, .04);
     }
 
-    .invoice-top-line {
-        height: 7px;
-        background: #e74c3c;
-    }
-
-    .invoice-content {
-        padding: 35px 40px;
-    }
-
-    .invoice-header {
+    .status-heading {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 20px;
-        padding-bottom: 25px;
-        border-bottom: 2px solid #f1f5f9;
+        gap: 12px;
+        margin-bottom: 20px;
     }
 
-    .invoice-brand h2 {
-        margin: 0 0 8px;
-        color: #333;
-        font-size: 30px;
-        font-weight: 800;
-    }
-
-        .invoice-brand h2 span {
-            color: #e74c3c;
+        .status-heading h3 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 19px;
+            font-weight: 700;
         }
 
-    .invoice-brand p {
-        margin: 0;
+    .status-order-id {
+        color: #c0392b;
+        font-weight: 700;
+    }
+
+    .current-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 13px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        color: #a16207;
+        background: #fef9c3;
+        border: 1px solid #fde68a;
+    }
+
+    .status-confirmed {
+        color: #1d4ed8;
+        background: #dbeafe;
+        border: 1px solid #bfdbfe;
+    }
+
+    .status-preparing {
+        color: #0369a1;
+        background: #e0f2fe;
+        border: 1px solid #bae6fd;
+    }
+
+    .status-shipping {
+        color: #7e22ce;
+        background: #f3e8ff;
+        border: 1px solid #e9d5ff;
+    }
+
+    .status-delivered {
+        color: #15803d;
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+    }
+
+    .status-cancelled {
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* PROGRESS */
+    .order-progress {
+        display: flex;
+        align-items: flex-start;
+        margin: 35px 0;
+    }
+
+    .progress-step {
+        position: relative;
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+    }
+
+        .progress-step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 60%;
+            width: 80%;
+            height: 3px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-step.completed:not(:last-child)::after {
+            background: #22c55e;
+        }
+
+    .progress-dot {
+        position: relative;
+        z-index: 1;
+        width: 31px;
+        height: 31px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        border-radius: 50%;
+        color: #94a3b8;
+        background: #e2e8f0;
+        font-size: 12px;
+    }
+
+    .progress-step.completed .progress-dot {
+        color: #fff;
+        background: #22c55e;
+    }
+
+    .progress-step.current .progress-dot {
+        color: #fff;
+        background: #e74c3c;
+        box-shadow: 0 0 0 5px #fee2e2;
+    }
+
+    .progress-label {
+        display: block;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .progress-step.completed .progress-label,
+    .progress-step.current .progress-label {
+        color: #334155;
+    }
+
+    /* UPDATE STATUS */
+    .status-update-box {
+        padding: 20px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+        .status-update-box h4 {
+            margin: 0 0 8px;
+            color: #334155;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .status-update-description {
+        margin-bottom: 17px;
         color: #64748b;
         font-size: 13px;
     }
 
-    .invoice-title {
-        text-align: right;
-    }
-
-        .invoice-title h3 {
-            margin: 0 0 8px;
-            color: #c0392b;
-            font-size: 25px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .invoice-title p {
-            margin: 4px 0;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-    .invoice-section {
-        margin-top: 28px;
-    }
-
-    .invoice-section-title {
+    .status-update-form {
         display: flex;
         align-items: center;
-        gap: 9px;
-        margin-bottom: 16px;
-        padding-bottom: 10px;
-        color: #c0392b;
-        font-size: 16px;
-        font-weight: 700;
-        border-bottom: 1px solid #fee2e2;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
-    .invoice-customer-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px 35px;
-    }
-
-    .invoice-info-item label {
-        display: block;
-        margin-bottom: 6px;
-        color: #94a3b8;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .invoice-info-item p {
-        margin: 0;
+    .status-select {
+        flex: 1;
+        min-width: 220px;
+        height: 45px;
+        padding: 8px 12px;
         color: #334155;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+    }
+
+        .status-select:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, .12);
+        }
+
+    .btn-update-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 45px;
+        padding: 10px 18px;
+        color: #fff;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
+        border-radius: 8px;
         font-size: 14px;
         font-weight: 600;
-        overflow-wrap: anywhere;
+        cursor: pointer;
+        transition: .2s;
     }
 
-    .invoice-product-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-        .invoice-product-table thead {
-            background: #fff1ef;
+        .btn-update-status:hover {
+            color: #fff;
+            background: #c0392b;
+            border-color: #c0392b;
         }
 
-        .invoice-product-table th {
-            padding: 13px 12px;
-            color: #9f3027;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: left;
-            text-transform: uppercase;
-            border-bottom: 1px solid #fecaca;
-        }
-
-        .invoice-product-table td {
-            padding: 15px 12px;
-            color: #475569;
-            font-size: 13px;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-        }
-
-    .invoice-product-name {
-        color: #334155;
-        font-size: 14px;
-        font-weight: 700;
-    }
-
-    .invoice-product-note {
-        margin-top: 5px;
-        color: #94a3b8;
-        font-size: 12px;
-    }
-
-    .invoice-money {
-        white-space: nowrap;
-        font-weight: 600;
-    }
-
-    .invoice-total {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
-    }
-
-    .invoice-total-box {
-        width: 100%;
-        max-width: 350px;
-    }
-
-    .invoice-total-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 10px 0;
+    /* TERMINAL MESSAGE */
+    .status-terminal-message {
+        padding: 15px;
         color: #64748b;
-        font-size: 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
-    .invoice-total-final {
-        margin-top: 5px;
-        padding-top: 16px;
-        color: #c0392b;
-        font-size: 18px;
-        font-weight: 800;
-        border-top: 2px solid #fecaca;
+    .status-alert {
+        max-width: 950px;
+        margin: 0 auto 18px;
     }
 
-    .invoice-payment {
-        display: inline-block;
-        padding: 6px 12px;
-        color: #c0392b;
-        background: #fff1ef;
-        border: 1px solid #fecaca;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .invoice-thanks {
-        margin-top: 35px;
-        padding-top: 22px;
-        color: #64748b;
-        text-align: center;
-        border-top: 1px dashed #cbd5e1;
-    }
-
-        .invoice-thanks h4 {
-            margin: 0 0 8px;
-            color: #e74c3c;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .invoice-thanks p {
-            margin: 0;
-            font-size: 13px;
-        }
-
-    .invoice-empty {
-        padding: 25px;
-        color: #94a3b8;
-        text-align: center;
-    }
-
-    @@media (max-width: 650px) {
-        .invoice-page {
-            padding: 15px 5px;
-        }
-
-        .invoice-content {
-            padding: 22px 15px;
-        }
-
-        .invoice-brand h2 {
-            font-size: 25px;
-        }
-
-        .invoice-title {
-            text-align: left;
-        }
-
-        .invoice-customer-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .invoice-product-table th,
-        .invoice-product-table td {
-            padding: 10px 7px;
-            font-size: 11px;
-        }
-
-        .invoice-product-name {
-            font-size: 12px;
-        }
-    }
-
-    /* CHẾ ĐỘ IN HÓA ĐƠN */
-    @@page {
-        size: A4;
-        margin: 15mm;
-    }
-
+    /* PRINT */
     @@media print {
-
-        body {
-            background: #fff !important;
-        }
-
         aside,
         .admin-content footer,
-        .invoice-actions {
+        .admin-order-toolbar,
+        .order-status-management,
+        .status-alert {
             display: none !important;
         }
 
@@ -341,289 +363,222 @@
             width: 100% !important;
         }
 
-        .invoice-page {
+        .admin-order-detail-page {
+            margin: 0 !important;
             padding: 0 !important;
         }
 
-        .invoice-card {
+        .order-invoice-card {
             max-width: none !important;
             border: none !important;
-            border-radius: 0 !important;
             box-shadow: none !important;
         }
+    }
 
-        .invoice-content {
-            padding: 10px 0 !important;
+    @@media(max-width: 650px) {
+        .admin-order-detail-page {
+            padding: 12px 5px;
         }
 
-        .invoice-top-line {
-            background: #e74c3c !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+        .order-status-management {
+            padding: 17px 12px;
         }
 
-        .invoice-product-table thead,
-        .invoice-payment {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+        .progress-label {
+            font-size: 9px;
         }
 
-        .invoice-product-table tr {
-            page-break-inside: avoid;
+        .status-update-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-update-status {
+            width: 100%;
         }
     }
 </style>
 
-<div class="invoice-page">
+<div class="admin-order-detail-page">
 
-    <!-- CÁC NÚT CHỨC NĂNG -->
-    <div class="invoice-actions">
+    <!-- TOOLBAR -->
+    <div class="admin-order-toolbar">
 
         @Html.ActionLink(
-            "Quay lại danh sách",
-            "Index",
-            "Orders",
-            new { area = "Admin" },
-            new { @class = "invoice-btn invoice-btn-back" }
-        )
+                 "Quay lại danh sách",
+                 "Index",
+                 "Orders",
+                 new { area = "Admin" },
+                 new { @class = "admin-order-btn admin-order-back" }
+             )
 
-        <div class="invoice-action-right">
+        <button type="button"
+                class="admin-order-btn admin-order-print"
+                onclick="window.print()">
 
-            <button type="button"
-                    class="invoice-btn invoice-btn-print"
-                    onclick="window.print()">
-                <i class="fa-solid fa-print"></i>
-                In hóa đơn
-            </button>
+            <i class="fa-solid fa-print"></i>
+            In hóa đơn
+
+        </button>
+
+    </div>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success status-alert">
+            <i class="fa-solid fa-circle-check"></i>
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger status-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- QUẢN LÝ TRẠNG THÁI -->
+    <div class="order-status-management">
+
+        <div class="status-heading">
+
+            <h3>
+                <i class="fa-solid fa-route" style="color:#e74c3c;"></i>
+                Tiến trình đơn hàng
+                <span class="status-order-id">#@Model.OrderID</span>
+            </h3>
+
+            <span class="current-status status-@statusClass">
+                <i class="fa-solid @statusIcon"></i>
+                @currentStatus
+            </span>
 
         </div>
+
+        @if (currentStatus == "Đã hủy")
+        {
+            <div class="status-terminal-message">
+                <i class="fa-solid fa-ban"></i>
+                Đơn hàng đã bị hủy và không thể tiếp tục xử lý.
+            </div>
+        }
+        else if (currentStep >= 0)
+        {
+            <!-- THANH TIẾN TRÌNH -->
+            <div class="order-progress">
+
+                @for (int i = 0; i < statusSteps.Length; i++)
+                {
+                    bool completed = i < currentStep;
+                    bool isCurrent = i == currentStep;
+
+                    string stepClass = completed
+                        ? "completed"
+                        : isCurrent ? "current" : "";
+
+                    <div class="progress-step @stepClass">
+
+                        <div class="progress-dot">
+
+                            @if (completed)
+                            {
+                                <i class="fa-solid fa-check"></i>
+                            }
+                            else
+                            {
+                                @(i + 1)
+                            }
+
+                        </div>
+
+                        <span class="progress-label">
+                            @statusSteps[i]
+                        </span>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+        <!-- FORM CẬP NHẬT -->
+        @if (nextStatuses.Any())
+        {
+            <div class="status-update-box">
+
+                <h4>
+                    <i class="fa-solid fa-pen-to-square"
+                       style="color:#e74c3c;"></i>
+                    Cập nhật trạng thái đơn hàng
+                </h4>
+
+                <p class="status-update-description">
+                    Chọn trạng thái tiếp theo để cập nhật tiến trình xử lý đơn hàng.
+                </p>
+
+                @using (Html.BeginForm(
+                    "UpdateStatus",
+                    "Orders",
+                    new { area = "Admin", id = Model.OrderID },
+                    FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="status-update-form">
+
+                        @Html.DropDownList(
+                                 "orderStatus",
+                                 nextStatuses,
+                                 "-- Chọn trạng thái tiếp theo --",
+                                 new
+                                 {
+                                     @class = "status-select",
+                                     required = "required"
+                                 }
+                             )
+
+                        <button type="submit"
+                                class="btn-update-status">
+
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Lưu trạng thái
+
+                        </button>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            if (currentStatus == "Đã giao hàng")
+            {
+                <div class="status-terminal-message">
+                    <i class="fa-solid fa-circle-check"
+                       style="color:#16a34a;"></i>
+
+                    Đơn hàng đã hoàn tất. Không thể thay đổi trạng thái nữa.
+                </div>
+            }
+            else if (currentStatus != "Đã hủy")
+            {
+                <div class="status-terminal-message">
+                    Không tìm thấy trạng thái tiếp theo hợp lệ.
+                    Vui lòng kiểm tra lại dữ liệu đơn hàng.
+                </div>
+            }
+        }
 
     </div>
 
     <!-- HÓA ĐƠN -->
-    <div class="invoice-card">
-
-        <div class="invoice-top-line"></div>
-
-        <div class="invoice-content">
-
-            <!-- HEADER HÓA ĐƠN -->
-            <div class="invoice-header">
-
-                <div class="invoice-brand">
-                    <h2>TOY<span>STORE</span></h2>
-
-                    <p>Cửa hàng đồ chơi và mô hình</p>
-                    <p>Cảm ơn bạn đã lựa chọn ToyStore.</p>
-                </div>
-
-                <div class="invoice-title">
-
-                    <h3>HÓA ĐƠN</h3>
-
-                    <p>
-                        Mã đơn hàng:
-                        <strong>#@Model.OrderID</strong>
-                    </p>
-
-                    <p>
-                        Ngày đặt:
-                        <strong>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</strong>
-                    </p>
-
-                </div>
-
-            </div>
-
-            <!-- THÔNG TIN KHÁCH HÀNG -->
-            <div class="invoice-section">
-
-                <div class="invoice-section-title">
-                    <i class="fa-solid fa-user"></i>
-                    THÔNG TIN KHÁCH HÀNG
-                </div>
-
-                <div class="invoice-customer-grid">
-
-                    <div class="invoice-info-item">
-                        <label>Họ và tên</label>
-                        <p>
-                            @(Model.Customer != null
-                                ? Model.Customer.CustomerName
-                                : "Không xác định")
-                        </p>
-                    </div>
-
-                    <div class="invoice-info-item">
-                        <label>Số điện thoại</label>
-                        <p>
-                            @(Model.Customer != null
-                                ? Model.Customer.CustomerPhone
-                                : "Không có thông tin")
-                        </p>
-                    </div>
-
-                    <div class="invoice-info-item">
-                        <label>Email</label>
-                        <p>
-                            @(Model.Customer != null
-                                ? Model.Customer.CustomerEmail
-                                : "Không có thông tin")
-                        </p>
-                    </div>
-
-                    <div class="invoice-info-item">
-                        <label>Địa chỉ khách hàng</label>
-                        <p>
-                            @(Model.Customer != null
-                                ? Model.Customer.CustomerAddress
-                                : "Không có thông tin")
-                        </p>
-                    </div>
-
-                    <div class="invoice-info-item">
-                        <label>Địa chỉ giao hàng</label>
-                        <p>
-                            @Model.AddressDelivery
-                        </p>
-                    </div>
-
-                    <div class="invoice-info-item">
-                        <label>Trạng thái / phương thức thanh toán</label>
-                        <p>
-                            <span class="invoice-payment">
-                                @(string.IsNullOrWhiteSpace(Model.PaymentStatus)
-                                    ? "Chưa cập nhật"
-                                    : Model.PaymentStatus)
-                            </span>
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- DANH SÁCH SẢN PHẨM -->
-            <div class="invoice-section">
-
-                <div class="invoice-section-title">
-                    <i class="fa-solid fa-box-open"></i>
-                    DANH SÁCH SẢN PHẨM
-                </div>
-
-                <div class="table-responsive">
-
-                    <table class="invoice-product-table">
-
-                        <thead>
-                            <tr>
-                                <th style="width: 42%;">Sản phẩm</th>
-                                <th style="width: 12%; text-align: center;">SL</th>
-                                <th style="width: 22%; text-align: right;">Đơn giá</th>
-                                <th style="width: 24%; text-align: right;">Thành tiền</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            @if (Model.OrderDetails != null &&
-                                 Model.OrderDetails.Any())
-                            {
-                                foreach (var item in Model.OrderDetails)
-                                {
-                                    <tr>
-
-                                        <td>
-                                            <div class="invoice-product-name">
-                                                @(item.Product != null
-                                                    ? item.Product.ProductName
-                                                    : "Sản phẩm không tồn tại")
-                                            </div>
-
-                                            @if (!string.IsNullOrWhiteSpace(item.Note))
-                                            {
-                                                <div class="invoice-product-note">
-                                                    Ghi chú: @item.Note
-                                                </div>
-                                            }
-                                        </td>
-
-                                        <td style="text-align: center;">
-                                            @item.Quantity
-                                        </td>
-
-                                        <td style="text-align: right;">
-                                            <span class="invoice-money">
-                                                @item.UnitPrice.ToString("N0") đ
-                                            </span>
-                                        </td>
-
-                                        <td style="text-align: right;">
-                                            <span class="invoice-money">
-                                                @((item.UnitPrice * item.Quantity).ToString("N0")) đ
-                                            </span>
-                                        </td>
-
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="4" class="invoice-empty">
-                                        Đơn hàng chưa có sản phẩm chi tiết.
-                                    </td>
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-            <!-- TỔNG THANH TOÁN -->
-            <div class="invoice-total">
-
-                <div class="invoice-total-box">
-
-                    <div class="invoice-total-row">
-                        <span>Số lượng sản phẩm</span>
-
-                        <strong>
-                            @(Model.OrderDetails == null
-                                ? 0
-                                : Model.OrderDetails.Sum(d => d.Quantity))
-                        </strong>
-                    </div>
-
-                    <div class="invoice-total-row invoice-total-final">
-                        <span>TỔNG THANH TOÁN</span>
-
-                        <span>
-                            @Model.TotalAmount.ToString("N0") đ
-                        </span>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- LỜI CẢM ƠN -->
-            <div class="invoice-thanks">
-
-                <h4>CẢM ƠN QUÝ KHÁCH!</h4>
-
-                <p>
-                    ToyStore rất hân hạnh được phục vụ quý khách.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
+    @Html.Partial(
+            "~/Views/Shared/_OrderInvoice.cshtml",
+            Model
+        )
 
 </div>

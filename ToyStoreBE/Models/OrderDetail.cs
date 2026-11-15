@@ -19,9 +19,9 @@ namespace ToyStoreBE.Models
         public int OrderID { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public string Note { get; set; }
     
         public virtual Order Order { get; set; }
         public virtual Product Product { get; set; }
-        public string Note { get; set; }
     }
 }

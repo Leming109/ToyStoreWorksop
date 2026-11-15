@@ -13,7 +13,7 @@ using System.Data.Entity.Infrastructure;
 
 namespace ToyStoreBE.Areas.Admin.Controllers
 {
-    public class CategoriesController : Controller
+    public class CategoriesController : AdminBaseController
     {
         private ToyStoreBEEntities db = new ToyStoreBEEntities();
 

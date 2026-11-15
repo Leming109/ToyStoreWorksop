@@ -1,11 +1,11 @@
 ﻿@model ToyStoreBE.Models.ViewModels.SearchProductVM
+
 @{
-    ViewBag.Title = "Hàng Hóa";
+    ViewBag.Title = "Quản lý hàng hóa";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
 }
 
 <style>
-    /* Tổng thể trang */
     .product-search-page {
         padding: 10px 0 25px;
         color: #1e293b;
@@ -28,7 +28,7 @@
             font-size: 14px;
         }
 
-    /* Khung tìm kiếm */
+    /* KHUNG TÌM KIẾM */
     .search-card {
         background: #fff;
         border: 1px solid #e2e8f0;
@@ -71,8 +71,9 @@
     }
 
         .search-field .form-control:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+            outline: none;
         }
 
     .search-actions {
@@ -84,16 +85,17 @@
         height: 45px;
         padding: 0 20px;
         border-radius: 8px;
-        background: #2563eb;
-        border: 1px solid #2563eb;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
         color: #fff;
         font-weight: 600;
         white-space: nowrap;
+        transition: .2s;
     }
 
         .btn-search:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
+            background: #c0392b;
+            border-color: #c0392b;
             color: #fff;
         }
 
@@ -112,12 +114,13 @@
     }
 
         .btn-reset:hover {
-            background: #f1f5f9;
-            color: #1e293b;
+            background: #fff1ef;
+            border-color: #f5b7b1;
+            color: #c0392b;
             text-decoration: none;
         }
 
-    /* Thanh sắp xếp */
+    /* THANH SẮP XẾP */
     .sort-card {
         display: flex;
         align-items: center;
@@ -150,13 +153,13 @@
     }
 
         .sort-link:hover {
-            background: #eff6ff;
-            border-color: #93c5fd;
-            color: #1d4ed8;
+            background: #fff1ef;
+            border-color: #f5b7b1;
+            color: #c0392b;
             text-decoration: none;
         }
 
-    /* Responsive */
+    /* RESPONSIVE */
     @@media (max-width: 1000px) {
         .search-form {
             grid-template-columns: 1fr 1fr;
@@ -193,21 +196,45 @@
 
 <div class="product-search-page">
 
+    <!-- TIÊU ĐỀ -->
     <div class="product-search-header">
-        <h2>QUẢN LÝ SẢN PHẨM</h2>
-        <p>Tìm kiếm, lọc và sắp xếp sản phẩm trong cửa hàng.</p>
+        <h2>QUẢN LÝ HÀNG HÓA</h2>
+        <p>Tìm kiếm, lọc và sắp xếp sản phẩm trong cửa hàng ToyStore.</p>
     </div>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- TÌM KIẾM -->
     <div class="search-card">
 
-        <h4 class="search-card-title">Tìm kiếm sản phẩm</h4>
+        <h4 class="search-card-title">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Tìm kiếm sản phẩm
+        </h4>
 
-        @using (Html.BeginForm("Index", "Products", FormMethod.Get))
+        @using (Html.BeginForm(
+            "Index",
+            "Products",
+            new { area = "Admin" },
+            FormMethod.Get))
         {
             <div class="search-form">
 
                 <div class="search-field">
                     <label for="SearchTerm">Tên sản phẩm</label>
+
                     @Html.TextBoxFor(m => m.SearchTerm, new
                     {
                         @class = "form-control",
@@ -217,85 +244,116 @@
 
                 <div class="search-field">
                     <label for="MinPrice">Giá tối thiểu</label>
+
                     @Html.TextBoxFor(m => m.MinPrice, new
                     {
                         @class = "form-control",
                         placeholder = "Từ giá...",
                         type = "number",
-                        min = "0"
+                        min = "0",
+                        step = "any"
                     })
                 </div>
 
                 <div class="search-field">
                     <label for="MaxPrice">Giá tối đa</label>
+
                     @Html.TextBoxFor(m => m.MaxPrice, new
                     {
                         @class = "form-control",
                         placeholder = "Đến giá...",
                         type = "number",
-                        min = "0"
+                        min = "0",
+                        step = "any"
                     })
                 </div>
 
                 <div class="search-actions">
+
                     <button type="submit" class="btn btn-search">
+                        <i class="fa-solid fa-search"></i>
                         Tìm kiếm
                     </button>
 
-                    <a href="@Url.Action("Index", "Products")"
+                    <a href="@Url.Action("Index", "Products", new { area = "Admin" })"
                        class="btn-reset">
                         Xóa lọc
                     </a>
+
                 </div>
 
             </div>
         }
     </div>
 
+    <!-- SẮP XẾP -->
     <div class="sort-card">
+
         <span class="sort-label">Sắp xếp theo:</span>
 
-        @Html.ActionLink("Tên A - Z", "Index",
-            new
-            {
-                sortOrder = "name_asc",
-                searchTerm = Model.SearchTerm,
-                minPrice = Model.MinPrice,
-                maxPrice = Model.MaxPrice
-            },
-            new { @class = "sort-link" })
+        @Html.ActionLink(
+                      "Tên A - Z",
+                      "Index",
+                      "Products",
+                      new
+                      {
+                          area = "Admin",
+                          sortOrder = "name_asc",
+                          searchTerm = Model.SearchTerm,
+                          minPrice = Model.MinPrice,
+                          maxPrice = Model.MaxPrice
+                      },
+                      new { @class = "sort-link" }
+                  )
 
-        @Html.ActionLink("Tên Z - A", "Index",
-            new
-            {
-                sortOrder = "name_desc",
-                searchTerm = Model.SearchTerm,
-                minPrice = Model.MinPrice,
-                maxPrice = Model.MaxPrice
-            },
-            new { @class = "sort-link" })
+        @Html.ActionLink(
+                      "Tên Z - A",
+                      "Index",
+                      "Products",
+                      new
+                      {
+                          area = "Admin",
+                          sortOrder = "name_desc",
+                          searchTerm = Model.SearchTerm,
+                          minPrice = Model.MinPrice,
+                          maxPrice = Model.MaxPrice
+                      },
+                      new { @class = "sort-link" }
+                  )
 
-        @Html.ActionLink("Giá thấp đến cao", "Index",
-            new
-            {
-                sortOrder = "price_asc",
-                searchTerm = Model.SearchTerm,
-                minPrice = Model.MinPrice,
-                maxPrice = Model.MaxPrice
-            },
-            new { @class = "sort-link" })
+        @Html.ActionLink(
+                      "Giá thấp đến cao",
+                      "Index",
+                      "Products",
+                      new
+                      {
+                          area = "Admin",
+                          sortOrder = "price_asc",
+                          searchTerm = Model.SearchTerm,
+                          minPrice = Model.MinPrice,
+                          maxPrice = Model.MaxPrice
+                      },
+                      new { @class = "sort-link" }
+                  )
 
-        @Html.ActionLink("Giá cao đến thấp", "Index",
-            new
-            {
-                sortOrder = "price_desc",
-                searchTerm = Model.SearchTerm,
-                minPrice = Model.MinPrice,
-                maxPrice = Model.MaxPrice
-            },
-            new { @class = "sort-link" })
+        @Html.ActionLink(
+                      "Giá cao đến thấp",
+                      "Index",
+                      "Products",
+                      new
+                      {
+                          area = "Admin",
+                          sortOrder = "price_desc",
+                          searchTerm = Model.SearchTerm,
+                          minPrice = Model.MinPrice,
+                          maxPrice = Model.MaxPrice
+                      },
+                      new { @class = "sort-link" }
+                  )
+
     </div>
 
+    <!-- DANH SÁCH SẢN PHẨM -->
     <div class="product-list-container">
         @Html.Partial("PV_ProductList", Model)
     </div>

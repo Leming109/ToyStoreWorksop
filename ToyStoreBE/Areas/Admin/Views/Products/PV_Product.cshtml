@@ -1,5 +1,12 @@
 ﻿@model ToyStoreBE.Models.Product
 
+@{
+    var currentImage = Model != null &&
+                       !string.IsNullOrWhiteSpace(Model.ProductImage)
+        ? Model.ProductImage
+        : "~/Content/images/default_img.png";
+}
+
 <style>
     .product-edit-fields {
         display: grid;
@@ -7,39 +14,43 @@
         gap: 22px 24px;
     }
 
-    .product-edit-field label {
-        display: block;
-        margin-bottom: 8px;
-        color: #334155;
-        font-size: 14px;
-        font-weight: 600;
+    .product-edit-field {
+        min-width: 0;
     }
 
-    .product-edit-field .form-control {
-        width: 100%;
-        min-height: 44px;
-        padding: 10px 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        background: #fff;
-        box-shadow: none;
-    }
-
-        .product-edit-field .form-control:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+        .product-edit-field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
         }
+
+        .product-edit-field .form-control {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: none;
+        }
+
+            .product-edit-field .form-control:focus {
+                border-color: #e74c3c;
+                box-shadow: 0 0 0 3px rgba(231, 76, 60, .12);
+                outline: none;
+            }
 
     .product-edit-description {
         margin-top: 24px;
         width: 100%;
-        grid-column: 1 / -1;
     }
 
         .product-edit-description textarea {
             display: block;
             width: 100%;
-            min-height: 190px;
+            min-height: 180px;
             box-sizing: border-box;
             padding: 14px;
             border: 1px solid #cbd5e1;
@@ -51,8 +62,8 @@
 
             .product-edit-description textarea:focus {
                 outline: none;
-                border-color: #2563eb;
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+                border-color: #e74c3c;
+                box-shadow: 0 0 0 3px rgba(231, 76, 60, .12);
             }
 
         .product-edit-field .text-danger,
@@ -62,103 +73,338 @@
             font-size: 13px;
         }
 
+    /* UPLOAD ẢNH */
+    .product-upload-area {
+        margin-top: 24px;
+        padding: 20px;
+        background: #fffafa;
+        border: 1px dashed #e7a29b;
+        border-radius: 10px;
+    }
+
+        .product-upload-area h5 {
+            margin: 0 0 15px;
+            color: #9f3027;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+    .product-upload-preview {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .product-preview-box {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+    }
+
+        .product-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 5px;
+        }
+
+    .product-upload-input {
+        flex: 1;
+        min-width: 220px;
+    }
+
+        .product-upload-input input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+        }
+
+    .product-upload-note {
+        margin-top: 10px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .product-upload-error {
+        display: block;
+        margin-top: 7px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
     @@media (max-width: 650px) {
         .product-edit-fields {
             grid-template-columns: 1fr;
         }
+
+        .product-preview-box {
+            width: 130px;
+            height: 130px;
+        }
     }
 </style>
 
+<!-- THÔNG TIN SẢN PHẨM -->
 <div class="product-edit-fields">
-
+    <!-- TÊN SẢN PHẨM -->
     <div class="product-edit-field">
-        <label for="CategoryID">Danh mục</label>
-        @Html.DropDownList(
-                 "CategoryID",
-                 null,
-                 new { @class = "form-control" }
-             )
+
+        @Html.LabelFor(m => m.ProductName, "Tên sản phẩm")
+
+        @Html.TextBoxFor(
+                                m => m.ProductName,
+                                new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Nhập tên sản phẩm...",
+                                    maxlength = "200",
+                                    required = "required"
+                                }
+                            )
+
         @Html.ValidationMessageFor(
-                 model => model.CategoryID,
-                 "",
-                 new { @class = "text-danger" }
-             )
+                                m => m.ProductName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
     </div>
 
+    <!-- DANH MỤC SẢN PHẨM -->
     <div class="product-edit-field">
-        @Html.LabelFor(model => model.ProductName, "Tên sản phẩm")
-        @Html.EditorFor(
-                 model => model.ProductName,
-                 new
-                 {
-                     htmlAttributes = new
+
+        @Html.Label("CategoryID", "Danh mục sản phẩm")
+
+        @if (ViewBag.LockCategory == true)
+        {
+            <!-- Khi Edit: chỉ hiển thị, không cho thay đổi -->
+            <input type="text"
+                   class="form-control"
+                   value="@ViewBag.CategoryName"
+                   readonly />
+        }
+        else
+        {
+            <!-- Khi Create: vẫn cho phép chọn danh mục -->
+            @Html.DropDownListFor(
+                     m => m.CategoryID,
+                     (SelectList)ViewBag.CategoryID,
+                     "-- Chọn danh mục --",
+                     new
                      {
                          @class = "form-control",
-                         placeholder = "Nhập tên sản phẩm"
+                         required = "required"
                      }
-                 }
-             )
-        @Html.ValidationMessageFor(
-                 model => model.ProductName,
-                 "",
-                 new { @class = "text-danger" }
-             )
+                 )
+
+            @Html.ValidationMessageFor(
+                     m => m.CategoryID,
+                     "",
+                     new { @class = "text-danger" }
+                 )
+        }
+
     </div>
 
+    <!-- GIÁ BÁN -->
     <div class="product-edit-field">
-        @Html.LabelFor(model => model.ProductPrice, "Đơn giá")
-        @Html.EditorFor(
-                 model => model.ProductPrice,
-                 new
-                 {
-                     htmlAttributes = new
-                     {
-                         @class = "form-control",
-                         placeholder = "Nhập đơn giá"
-                     }
-                 }
-             )
+
+        @Html.LabelFor(m => m.ProductPrice, "Giá bán")
+
+        @Html.TextBoxFor(
+                                m => m.ProductPrice,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "number",
+                                    min = "0",
+                                    step = "0.01",
+                                    placeholder = "Nhập giá bán..."
+                                }
+                            )
+
         @Html.ValidationMessageFor(
-                 model => model.ProductPrice,
-                 "",
-                 new { @class = "text-danger" }
-             )
+                                m => m.ProductPrice,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
     </div>
 
+    <!-- GIÁ KHUYẾN MÃI -->
     <div class="product-edit-field">
-        @Html.LabelFor(model => model.ProductImage, "Hình ảnh")
-        @Html.EditorFor(
-                 model => model.ProductImage,
-                 new
-                 {
-                     htmlAttributes = new
-                     {
-                         @class = "form-control",
-                         placeholder = "Nhập đường dẫn hình ảnh"
-                     }
-                 }
-             )
+
+        @Html.LabelFor(m => m.SalePrice, "Giá khuyến mãi")
+
+        @Html.TextBoxFor(
+                                m => m.SalePrice,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "number",
+                                    min = "0",
+                                    step = "0.01",
+                                    placeholder = "Nhập giá khuyến mãi..."
+                                }
+                            )
+
         @Html.ValidationMessageFor(
-                 model => model.ProductImage,
-                 "",
-                 new { @class = "text-danger" }
-             )
+                                m => m.SalePrice,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+    </div>
+
+    <!-- SỐ LƯỢNG TỒN KHO -->
+    <div class="product-edit-field">
+
+        @Html.LabelFor(m => m.StockQuantity, "Số lượng tồn kho")
+
+        @Html.TextBoxFor(
+                                m => m.StockQuantity,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "number",
+                                    min = "0",
+                                    step = "1",
+                                    placeholder = "Nhập số lượng tồn kho..."
+                                }
+                            )
+
+        @Html.ValidationMessageFor(
+                                m => m.StockQuantity,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
     </div>
 
 </div>
 
-<div class="product-edit-field product-edit-description">
-    @Html.LabelFor(model => model.ProductDecription, "Mô tả sản phẩm")
-    @Html.TextAreaFor(
-            model => model.ProductDecription,
-            new
-            {
-                placeholder = "Nhập thông tin chi tiết về sản phẩm..."
+<!-- UPLOAD ẢNH -->
+<div class="product-upload-area">
+
+    <h5>
+        <i class="fa-solid fa-image"></i>
+        Hình ảnh sản phẩm
+    </h5>
+
+    <div class="product-upload-preview">
+
+        <div class="product-preview-box">
+            <img id="productImagePreview"
+                 src="@Url.Content(currentImage)"
+                 alt="Ảnh xem trước sản phẩm" />
+        </div>
+
+        <div class="product-upload-input">
+
+            <label for="UploadImg">Chọn ảnh từ máy tính</label>
+
+            <input type="file"
+                   id="UploadImg"
+                   name="UploadImg"
+                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+
+            <div class="product-upload-note">
+                Định dạng hỗ trợ: JPG, JPEG, PNG, WEBP.<br />
+                Dung lượng tối đa: 5 MB.<br />
+                Không chọn ảnh mới khi Edit nếu muốn giữ ảnh cũ.
+            </div>
+
+            <span id="productImageError"
+                  class="product-upload-error"></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    (function () {
+        var input = document.getElementById("UploadImg");
+        var preview = document.getElementById("productImagePreview");
+        var error = document.getElementById("productImageError");
+
+        if (!input || !preview) return;
+
+        var originalImage = preview.src;
+        var maxSize = 5 * 1024 * 1024;
+
+        input.addEventListener("change", function () {
+
+            error.textContent = "";
+
+            var file = input.files && input.files[0];
+
+            if (!file) {
+                preview.src = originalImage;
+                return;
             }
-        )
-    @Html.ValidationMessageFor(
-            model => model.ProductDecription,
-            "",
-            new { @class = "text-danger" }
-        )
-</div>
+
+            var allowedExtensions = [
+                ".jpg", ".jpeg", ".png", ".webp"
+            ];
+
+            var extension = file.name.substring(
+                file.name.lastIndexOf(".")
+            ).toLowerCase();
+
+            if (allowedExtensions.indexOf(extension) === -1) {
+                error.textContent =
+                    "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc WEBP.";
+
+                input.value = "";
+                preview.src = originalImage;
+                return;
+            }
+
+            if (file.size > maxSize) {
+                error.textContent =
+                    "Dung lượng ảnh không được vượt quá 5 MB.";
+
+                input.value = "";
+                preview.src = originalImage;
+                return;
+            }
+
+            if (file.type && ![
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ].includes(file.type)) {
+                error.textContent = "File được chọn không phải ảnh hợp lệ.";
+                input.value = "";
+                preview.src = originalImage;
+                return;
+            }
+
+            var reader = new FileReader();
+
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+            };
+
+            reader.onerror = function () {
+                error.textContent = "Không thể đọc file ảnh.";
+                input.value = "";
+                preview.src = originalImage;
+            };
+
+            reader.readAsDataURL(file);
+        });
+    })();
+</script>

@@ -1,86 +1,204 @@
 ﻿@model ToyStoreBE.Models.Product
 
 @{
-    ViewBag.Title = "Chi Tiết Sản Phẩm";
+    ViewBag.Title = "Chi tiết sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    var imagePath = !string.IsNullOrWhiteSpace(Model.ProductImage)
+        ? Model.ProductImage
+        : "~/Content/images/default_img.png";
+
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
 }
 
 <style>
-    .product-detail {
+    .product-detail-page {
         max-width: 1100px;
-        margin: 30px auto;
-        padding: 28px;
+        margin: 25px auto;
+        padding: 0 20px;
+        color: #1e293b;
+    }
+
+    .detail-heading {
+        margin: 0 0 8px;
+        color: #1e293b;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .detail-subtitle {
+        margin: 0 0 24px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .product-detail {
+        overflow: hidden;
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
     }
 
-    .detail-heading {
-        margin: 0 0 24px;
-        color: #1e293b;
-        font-size: 28px;
-        font-weight: 700;
+    .product-detail-top {
+        height: 6px;
+        background: #e74c3c;
+    }
+
+    .product-detail-body {
+        padding: 30px;
     }
 
     .product-layout {
         display: grid;
-        grid-template-columns: 340px minmax(0, 1fr);
-        gap: 32px;
+        grid-template-columns: 380px minmax(0, 1fr);
+        gap: 35px;
         align-items: start;
     }
 
+    /* HÌNH ẢNH */
     .product-image {
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 300px;
-        padding: 18px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        min-height: 350px;
+        padding: 20px;
+        background: #fffafa;
+        border: 1px solid #fee2e2;
         border-radius: 12px;
     }
 
         .product-image img {
             display: block;
             max-width: 100%;
-            max-height: 300px;
+            max-height: 330px;
             object-fit: contain;
         }
+
+    /* THÔNG TIN */
+    .product-info {
+        min-width: 0;
+    }
+
+    .product-id {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 6px 11px;
+        color: #c0392b;
+        background: #fff1ef;
+        border: 1px solid #fecaca;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
 
     .product-name {
         margin: 0 0 16px;
         color: #0f172a;
-        font-size: 26px;
+        font-size: 27px;
         line-height: 1.4;
         font-weight: 700;
+        overflow-wrap: anywhere;
     }
 
     .product-price {
-        margin-bottom: 20px;
+        margin-bottom: 22px;
         color: #dc2626;
-        font-size: 28px;
+        font-size: 29px;
+        font-weight: 800;
+    }
+
+    /* THÔNG TIN PHỤ */
+    .product-meta-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 25px;
+    }
+
+    .product-meta-item {
+        padding: 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        min-width: 0;
+    }
+
+        .product-meta-item label {
+            display: block;
+            margin-bottom: 7px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .product-meta-item p {
+            margin: 0;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+    .product-category {
+        display: inline-block;
+        padding: 5px 10px;
+        color: #c0392b;
+        background: #fff1ef;
+        border: 1px solid #fecaca;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .stock-status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 700;
     }
 
-    .product-meta {
-        margin-bottom: 20px;
-        color: #475569;
-        font-size: 16px;
+    .stock-in {
+        color: #15803d;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+    }
+
+    .stock-out {
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* MÔ TẢ */
+    .product-description-section {
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .product-description-title {
+        margin-bottom: 12px;
+        color: #c0392b;
+        font-size: 17px;
+        font-weight: 700;
     }
 
     .product-description {
         color: #475569;
         line-height: 1.8;
         white-space: pre-line;
+        overflow-wrap: anywhere;
     }
 
-        .product-description strong {
-            display: block;
-            margin-bottom: 6px;
-            color: #1e293b;
-        }
+    .description-empty {
+        color: #94a3b8;
+        font-style: italic;
+    }
 
+    /* NÚT THAO TÁC */
     .detail-actions {
         display: flex;
         flex-wrap: wrap;
@@ -89,90 +207,219 @@
     }
 
     .detail-btn {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
         padding: 11px 20px;
         border-radius: 8px;
-        text-decoration: none;
+        text-decoration: none !important;
+        font-size: 14px;
         font-weight: 600;
+        transition: .2s;
     }
 
     .edit-btn {
         color: #fff;
-        background: #2563eb;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
     }
 
         .edit-btn:hover {
             color: #fff;
-            background: #1d4ed8;
-            text-decoration: none;
+            background: #c0392b;
+            border-color: #c0392b;
         }
 
     .back-btn {
         color: #334155;
-        background: #e2e8f0;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
     }
 
         .back-btn:hover {
-            color: #0f172a;
-            background: #cbd5e1;
-            text-decoration: none;
+            color: #1e293b;
+            background: #e2e8f0;
         }
 
     @@media (max-width: 768px) {
+        .product-detail-page {
+            padding: 0 10px;
+        }
+
+        .product-detail-body {
+            padding: 20px;
+        }
+
         .product-layout {
             grid-template-columns: 1fr;
         }
 
         .product-image {
-            min-height: 220px;
+            min-height: 240px;
         }
+
+            .product-image img {
+                max-height: 250px;
+            }
 
         .product-name {
             font-size: 22px;
         }
+
+        .product-meta-list {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
-<h2 class="detail-heading">Chi tiết sản phẩm</h2>
+<div class="product-detail-page">
 
-<div class="product-detail">
-    <div class="product-layout">
-        <div class="product-image">
-            <img src="@Url.Content(Model.ProductImage)"
-                 alt="@Model.ProductName" />
+    <!-- TIÊU ĐỀ -->
+    <h2 class="detail-heading">CHI TIẾT SẢN PHẨM</h2>
+
+    <p class="detail-subtitle">
+        Xem thông tin, hình ảnh, giá bán và số lượng tồn kho của sản phẩm.
+    </p>
+
+    <div class="product-detail">
+
+        <div class="product-detail-top"></div>
+
+        <div class="product-detail-body">
+
+            <div class="product-layout">
+
+                <!-- HÌNH ẢNH -->
+                <div class="product-image">
+
+                    <img src="@Url.Content(imagePath)"
+                         alt="@Model.ProductName"
+                         onerror="this.onerror=null;this.src='@Url.Content("~/Content/images/default_img.png")';" />
+
+                </div>
+
+                <!-- THÔNG TIN SẢN PHẨM -->
+                <div class="product-info">
+
+                    <span class="product-id">
+                        Mã sản phẩm: #@Model.ProductID
+                    </span>
+
+                    <h3 class="product-name">
+                        @Model.ProductName
+                    </h3>
+
+                    <div class="product-price">
+                        @string.Format(culture, "{0:N0} ₫", Model.ProductPrice)
+                    </div>
+
+                    <div class="product-meta-list">
+
+                        <!-- DANH MỤC -->
+                        <div class="product-meta-item">
+
+                            <label>Danh mục</label>
+
+                            <p>
+                                @if (Model.Category != null)
+                                {
+                                    <span class="product-category">
+                                        @Model.Category.CategoryName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>Chưa phân loại</span>
+                                }
+                            </p>
+
+                        </div>
+
+                        <!-- TỒN KHO -->
+                        <div class="product-meta-item">
+
+                            <label>Số lượng tồn kho</label>
+
+                            <p>
+                                @if (Model.StockQuantity > 0)
+                                {
+                                    <span class="stock-status stock-in">
+                                        Còn @Model.StockQuantity sản phẩm
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="stock-status stock-out">
+                                        Hết hàng
+                                    </span>
+                                }
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- MÔ TẢ -->
+                    <div class="product-description-section">
+
+                        <div class="product-description-title">
+                            <i class="fa-solid fa-align-left"></i>
+                            Mô tả sản phẩm
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.ProductDecription))
+                        {
+                            <div class="product-description">
+                                @Model.ProductDecription
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="description-empty">
+                                Sản phẩm chưa có mô tả.
+                            </p>
+                        }
+
+                    </div>
+
+                    <!-- THAO TÁC -->
+                    <div class="detail-actions">
+
+                        @Html.ActionLink(
+                                 "Sửa sản phẩm",
+                                 "Edit",
+                                 "Products",
+                                 new
+                                 {
+                                     area = "Admin",
+                                     id = Model.ProductID
+                                 },
+                                 new
+                                 {
+                                     @class = "detail-btn edit-btn"
+                                 }
+                             )
+
+                        @Html.ActionLink(
+                                 "Quay lại danh sách",
+                                 "Index",
+                                 "Products",
+                                 new { area = "Admin" },
+                                 new
+                                 {
+                                     @class = "detail-btn back-btn"
+                                 }
+                             )
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="product-info">
-            <h3 class="product-name">@Model.ProductName</h3>
-
-            <div class="product-price">
-                @string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"),
-                    "{0:N0} VNĐ", Model.ProductPrice)
-            </div>
-
-            <div class="product-meta">
-                <strong>Danh mục:</strong>
-                @(Model.Category != null ? Model.Category.CategoryName : "Chưa phân loại")
-            </div>
-
-            <div class="product-description">
-                <strong>Mô tả sản phẩm</strong>
-                @Model.ProductDecription
-            </div>
-
-            <div class="detail-actions">
-                @Html.ActionLink(
-                    "Sửa sản phẩm",
-                    "Edit",
-                    new { id = Model.ProductID },
-                    new { @class = "detail-btn edit-btn" })
-
-                @Html.ActionLink(
-                    "Quay lại danh sách",
-                    "Index",
-                    null,
-                    new { @class = "detail-btn back-btn" })
-            </div>
-        </div>
     </div>
+
 </div>

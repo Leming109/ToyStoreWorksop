@@ -1,0 +1,398 @@
+﻿
+@model ToyStoreBE.Models.Order
+
+@using System.Globalization
+@using System.Linq
+
+@{
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+
+    var details = Model.OrderDetails == null
+        ? Enumerable.Empty<ToyStoreBE.Models.OrderDetail>()
+        : Model.OrderDetails;
+
+    decimal calculatedTotal = details.Sum(
+        x => x.UnitPrice * x.Quantity
+    );
+}
+
+<style>
+    .order-invoice-card {
+        max-width: 950px;
+        margin: 0 auto;
+        padding: 30px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, .04);
+    }
+
+    .invoice-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding-bottom: 22px;
+        border-bottom: 2px solid #fee2e2;
+    }
+
+        .invoice-heading h2 {
+            margin: 0 0 8px;
+            color: #c0392b;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .invoice-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .invoice-order-code {
+        color: #dc2626;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .invoice-section {
+        margin-top: 25px;
+    }
+
+        .invoice-section h4 {
+            margin: 0 0 17px;
+            padding-bottom: 10px;
+            color: #9f3027;
+            border-bottom: 1px solid #fee2e2;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    .invoice-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 17px 25px;
+    }
+
+    .invoice-info-item label {
+        display: block;
+        margin-bottom: 6px;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .invoice-info-item strong {
+        color: #334155;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .invoice-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .invoice-product-table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+    }
+
+        .invoice-product-table th {
+            padding: 14px 12px;
+            background: #fff1ef;
+            color: #9f3027;
+            border-bottom: 1px solid #fecaca;
+            font-size: 12px;
+            text-align: left;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .invoice-product-table td {
+            padding: 15px 12px;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .invoice-product-table tr:last-child td {
+            border-bottom: none;
+        }
+
+    .invoice-product-name {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .invoice-money {
+        color: #dc2626 !important;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .invoice-total-box {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .invoice-total-content {
+        width: 100%;
+        max-width: 330px;
+        padding: 18px;
+        background: #fff7f7;
+        border: 1px solid #fee2e2;
+        border-radius: 9px;
+    }
+
+    .invoice-total-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+        .invoice-total-row:last-child {
+            margin-bottom: 0;
+            padding-top: 13px;
+            border-top: 1px solid #fecaca;
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+    .invoice-final-price {
+        color: #dc2626;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .invoice-thank-you {
+        margin-top: 28px;
+        padding-top: 18px;
+        border-top: 1px dashed #cbd5e1;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    @@media(max-width: 600px) {
+        .order-invoice-card {
+            padding: 18px 12px;
+        }
+
+        .invoice-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .invoice-heading h2 {
+            font-size: 21px;
+        }
+    }
+
+    @@media print {
+        .order-invoice-card {
+            box-shadow: none;
+            border: none;
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="order-invoice-card">
+
+    <!-- TIÊU ĐỀ HÓA ĐƠN -->
+    <div class="invoice-heading">
+
+        <div>
+            <h2>
+                <i class="fa-solid fa-store"></i>
+                TOYSTORE
+            </h2>
+
+            <p>HÓA ĐƠN ĐẶT HÀNG</p>
+        </div>
+
+        <div>
+            <div class="invoice-order-code">
+                Đơn hàng #@Model.OrderID
+            </div>
+
+            <p>
+                Ngày đặt:
+                @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+
+    </div>
+
+    <!-- THÔNG TIN KHÁCH HÀNG -->
+    <div class="invoice-section">
+
+        <h4>
+            <i class="fa-solid fa-user"></i>
+            Thông tin khách hàng
+        </h4>
+
+        <div class="invoice-info-grid">
+
+            <div class="invoice-info-item">
+                <label>Họ và tên</label>
+                <strong>
+                    @(Model.Customer != null
+                        ? Model.Customer.CustomerName
+                        : "Không xác định")
+                </strong>
+            </div>
+
+            <div class="invoice-info-item">
+                <label>Số điện thoại</label>
+                <strong>
+                    @(Model.Customer != null
+                        ? Model.Customer.CustomerPhone
+                        : "Không xác định")
+                </strong>
+            </div>
+
+            <div class="invoice-info-item">
+                <label>Email</label>
+                <strong>
+                    @(Model.Customer != null &&
+                      !string.IsNullOrWhiteSpace(Model.Customer.CustomerEmail)
+                        ? Model.Customer.CustomerEmail
+                        : "Chưa cập nhật")
+                </strong>
+            </div>
+
+            <div class="invoice-info-item">
+                <label>Phương thức thanh toán</label>
+                <strong>
+                    @(string.IsNullOrWhiteSpace(Model.PaymentStatus)
+                        ? "Chưa cập nhật"
+                        : Model.PaymentStatus)
+                </strong>
+            </div>
+
+            <div class="invoice-info-item">
+                <label>Địa chỉ giao hàng</label>
+                <strong>@Model.AddressDelivery</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    <div class="invoice-section">
+
+        <h4>
+            <i class="fa-solid fa-box"></i>
+            Sản phẩm trong đơn hàng
+        </h4>
+
+        <div class="invoice-table-wrapper">
+
+            <table class="invoice-product-table">
+
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (details.Any())
+                    {
+                        foreach (var item in details)
+                        {
+                            <tr>
+
+                                <td>
+                                    <span class="invoice-product-name">
+                                        @(item.Product != null
+                                            ? item.Product.ProductName
+                                            : "Sản phẩm không còn tồn tại")
+                                    </span>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Note))
+                                    {
+                                        <div style="margin-top:5px;color:#94a3b8;font-size:11px;">
+                                            Ghi chú: @item.Note
+                                        </div>
+                                    }
+                                </td>
+
+                                <td>
+                                    @item.Quantity
+                                </td>
+
+                                <td class="invoice-money">
+                                    @item.UnitPrice.ToString("N0", culture) ₫
+                                </td>
+
+                                <td class="invoice-money">
+                                    @((item.UnitPrice * item.Quantity).ToString("N0", culture)) ₫
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align:center;color:#94a3b8;">
+                                Không có sản phẩm trong đơn hàng.
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- TỔNG TIỀN -->
+    <div class="invoice-total-box">
+
+        <div class="invoice-total-content">
+
+            <div class="invoice-total-row">
+                <span>Số loại sản phẩm</span>
+                <strong>@details.Count()</strong>
+            </div>
+
+            <div class="invoice-total-row">
+                <span>Tổng số lượng</span>
+                <strong>@details.Sum(x => x.Quantity)</strong>
+            </div>
+
+            <div class="invoice-total-row">
+                <span>Tổng cộng</span>
+
+                <strong class="invoice-final-price">
+                    @Model.TotalAmount.ToString("N0", culture) ₫
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="invoice-thank-you">
+        Cảm ơn quý khách đã mua sắm tại ToyStore!
+    </div>
+
+</div>

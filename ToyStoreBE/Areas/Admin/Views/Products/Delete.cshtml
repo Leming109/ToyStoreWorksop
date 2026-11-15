@@ -82,12 +82,12 @@
 
     .delete-btn-danger {
         color: #fff;
-        background: #dc2626;
+        background: #e74c3c;
     }
 
         .delete-btn-danger:hover {
             color: #fff;
-            background: #b91c1c;
+            background: #c0392b;
         }
 
     .delete-btn-back {
@@ -125,8 +125,9 @@
     </div>
 
     <div class="delete-warning" role="alert">
-        Cảnh báo: Thao tác này sẽ xóa sản phẩm khỏi hệ thống và không thể hoàn tác.
-        Vui lòng kiểm tra kỹ trước khi xác nhận.
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Lưu ý: Không thể xóa sản phẩm đã được sử dụng trong đơn hàng.
+        Hệ thống sẽ kiểm tra dữ liệu liên quan trước khi thực hiện thao tác xóa.
     </div>
 
     <div class="delete-card">
@@ -138,24 +139,36 @@
             @Html.Partial("PV_ProductInfo", Model)
         </div>
 
-        @using (Html.BeginForm("Delete", "Products", FormMethod.Post))
+        @using (Html.BeginForm(
+     "Delete",
+     "Products",
+     new
+     {
+         area = "Admin",
+         id = Model.ProductID
+     },
+     FormMethod.Post))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(model => model.ProductID)
 
             <div class="delete-actions">
+
                 @Html.ActionLink(
                     "Quay lại danh sách",
                     "Index",
-                    null,
+                    "Products",
+                    new { area = "Admin" },
                     new { @class = "delete-btn delete-btn-back" }
                 )
 
                 <button type="submit"
                         class="delete-btn delete-btn-danger"
-                        onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không? Thao tác này không thể hoàn tác.');">
+                        onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                    <i class="fa-solid fa-trash"></i>
                     Xóa sản phẩm
                 </button>
+
             </div>
         }
     </div>

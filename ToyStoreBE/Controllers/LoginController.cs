@@ -231,5 +231,125 @@ namespace ToyStoreBE.Controllers
             // Quay về trang chủ
             return RedirectToAction("Index", "Home");
         }
+
+        // =========================================
+        // GET: Login/InfoProfile
+        // =========================================
+        [Authorize]
+        [HttpGet]
+        public ActionResult InfoProfile()
+        {
+            string username = User.Identity.Name;
+
+            // Chỉ cho phép tài khoản khách hàng
+            var user = db.Users.FirstOrDefault(u =>
+                u.Username == username && u.UserRole == "C");
+
+            if (user == null)
+            {
+                return new HttpStatusCodeResult(
+                    System.Net.HttpStatusCode.Forbidden);
+            }
+
+            // Lấy thông tin khách hàng đang đăng nhập
+            var customer = db.Customers.FirstOrDefault(c =>
+                c.Username == user.Username);
+
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Hiển thị tên tài khoản
+            ViewBag.Username = user.Username.TrimEnd();
+
+            var model = new InfoProfileViewModel
+            {
+                CustomerName = customer.CustomerName,
+                CustomerPhone = customer.CustomerPhone,
+                CustomerEmail = customer.CustomerEmail,
+                CustomerAddress = customer.CustomerAddress
+            };
+
+            return View(model);
+        }
+
+
+        // =========================================
+        // POST: Login/InfoProfile
+        // =========================================
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult InfoProfile(InfoProfileViewModel model)
+        {
+            string username = User.Identity.Name;
+
+            // Xác định tài khoản khách hàng đang đăng nhập
+            var user = db.Users.FirstOrDefault(u =>
+                u.Username == username && u.UserRole == "C");
+
+            if (user == null)
+            {
+                return new HttpStatusCodeResult(
+                    System.Net.HttpStatusCode.Forbidden);
+            }
+
+            // Chỉ lấy Customer thuộc tài khoản hiện tại
+            var customer = db.Customers.FirstOrDefault(c =>
+                c.Username == user.Username);
+
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+
+            ViewBag.Username = user.Username.TrimEnd();
+
+            if (model == null)
+            {
+                return new HttpStatusCodeResult(
+                    System.Net.HttpStatusCode.BadRequest);
+            }
+
+            // Chuẩn hóa dữ liệu
+            model.CustomerName = model.CustomerName?.Trim();
+            model.CustomerPhone = model.CustomerPhone?.Trim();
+            model.CustomerEmail = model.CustomerEmail?.Trim();
+            model.CustomerAddress = model.CustomerAddress?.Trim();
+
+            // Kiểm tra lại Data Annotation sau khi chuẩn hóa
+            TryValidateModel(model);
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Chỉ cập nhật thông tin Customer
+            // Không thay đổi Username hoặc Password
+            customer.CustomerName = model.CustomerName;
+            customer.CustomerPhone = model.CustomerPhone;
+            customer.CustomerEmail = model.CustomerEmail;
+            customer.CustomerAddress = model.CustomerAddress;
+
+            try
+            {
+                db.SaveChanges();
+
+                TempData["ProfileSuccess"] =
+                    "Cập nhật thông tin cá nhân thành công.";
+
+                return RedirectToAction("InfoProfile");
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Không thể cập nhật thông tin. Vui lòng kiểm tra lại dữ liệu.");
+
+                return View(model);
+            }
+        }
     }
 }

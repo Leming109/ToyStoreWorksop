@@ -1,7 +1,7 @@
 ﻿@model ToyStoreBE.Models.Product
 
 @{
-    ViewBag.Title = "Cập Nhật Sản Phẩm";
+    ViewBag.Title = "Cập nhật sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
 }
 
@@ -40,15 +40,15 @@
 
     .edit-card-header {
         padding: 20px 26px;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
     }
 
         .edit-card-header h3 {
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: #334155;
+            color: #9f3027;
         }
 
     .edit-card-body {
@@ -73,6 +73,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
         min-height: 42px;
         padding: 10px 18px;
         border: 0;
@@ -81,27 +82,42 @@
         font-weight: 600;
         text-decoration: none !important;
         cursor: pointer;
+        transition: .2s;
     }
 
     .edit-btn-save {
         color: #fff;
-        background: #2563eb;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
     }
 
         .edit-btn-save:hover {
             color: #fff;
-            background: #1d4ed8;
+            background: #c0392b;
+            border-color: #c0392b;
         }
 
     .edit-btn-back {
         color: #334155;
         background: #e2e8f0;
+        border: 1px solid #cbd5e1;
     }
 
         .edit-btn-back:hover {
-            color: #0f172a;
+            color: #1e293b;
             background: #cbd5e1;
         }
+
+    /* Đồng bộ màu các ô nhập */
+    .edit-card-body .form-control:focus {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, .12);
+        outline: none;
+    }
+
+    .edit-validation {
+        color: #dc2626;
+    }
 
     @@media (max-width: 600px) {
         .edit-product-page {
@@ -123,45 +139,78 @@
 </style>
 
 <div class="edit-product-page">
+
+    <!-- TIÊU ĐỀ -->
     <div class="edit-heading">
-        <h2>Cập nhật sản phẩm</h2>
-        <p>Chỉnh sửa thông tin sản phẩm rồi lưu thay đổi.</p>
+        <h2>CẬP NHẬT SẢN PHẨM</h2>
+        <p>
+            Chỉnh sửa thông tin, giá bán, số lượng tồn kho
+            và hình ảnh sản phẩm.
+        </p>
     </div>
 
+    <!-- FORM CẬP NHẬT -->
     @using (Html.BeginForm(
         "Edit",
         "Products",
+        new
+        {
+            area = "Admin",
+            id = Model.ProductID
+        },
         FormMethod.Post,
-        new { enctype = "multipart/form-data" }))
+        new
+        {
+            enctype = "multipart/form-data"
+        }))
     {
         @Html.AntiForgeryToken()
+
         @Html.HiddenFor(model => model.ProductID)
 
         <div class="edit-card">
+
             <div class="edit-card-header">
-                <h3>Thông tin sản phẩm</h3>
+                <h3>
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Thông tin sản phẩm
+                </h3>
             </div>
 
             <div class="edit-card-body">
+
                 @Html.ValidationSummary(
-                    true,
-                    "",
-                    new { @class = "text-danger edit-validation" })
+                         true,
+                         "",
+                         new { @class = "text-danger edit-validation" }
+                     )
 
                 @Html.Partial("PV_Product", Model)
+
             </div>
 
             <div class="edit-actions">
+
                 @Html.ActionLink(
-                    "Quay lại danh sách",
-                    "Index",
-                    null,
-                    new { @class = "edit-btn edit-btn-back" })
+                         "Quay lại danh sách",
+                         "Index",
+                         "Products",
+                         new { area = "Admin" },
+                         new { @class = "edit-btn edit-btn-back" }
+                     )
 
                 <button type="submit" class="edit-btn edit-btn-save">
+                    <i class="fa-solid fa-floppy-disk"></i>
                     Lưu thay đổi
                 </button>
+
             </div>
+
         </div>
     }
+
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

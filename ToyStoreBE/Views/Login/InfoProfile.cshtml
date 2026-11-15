@@ -1,0 +1,401 @@
+﻿@model ToyStoreBE.Models.MyModel.InfoProfileViewModel
+
+@{
+    ViewBag.Title = "Thông tin cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .profile-page {
+        max-width: 1000px;
+        margin: 25px auto;
+        padding: 0 15px 35px;
+        color: #334155;
+    }
+
+    .profile-heading {
+        margin-bottom: 25px;
+    }
+
+        .profile-heading h2 {
+            margin: 0 0 8px;
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .profile-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    .profile-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(15,23,42,.05);
+    }
+
+    .profile-card-header {
+        padding: 22px 25px;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+        .profile-card-header h4 {
+            margin: 0 0 6px;
+            color: #c0392b;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .profile-card-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .profile-card-body {
+        padding: 28px;
+    }
+
+    .profile-account {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        margin-bottom: 28px;
+        padding: 18px;
+        background: #fffafa;
+        border: 1px solid #fee2e2;
+        border-radius: 10px;
+    }
+
+    .profile-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        color: #fff;
+        background: #e74c3c;
+        border-radius: 50%;
+        font-size: 25px;
+    }
+
+    .profile-account-info strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #334155;
+        font-size: 16px;
+    }
+
+    .profile-account-info span {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .profile-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 24px;
+    }
+
+    .profile-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .profile-field .form-control {
+        width: 100%;
+        min-height: 45px;
+        padding: 10px 13px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        box-shadow: none;
+    }
+
+        .profile-field .form-control:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231,76,60,.12);
+        }
+
+    .profile-field textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .profile-field-full {
+        grid-column: 1 / -1;
+    }
+
+    .profile-field .text-danger {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    .profile-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .profile-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none !important;
+        transition: .2s;
+    }
+
+    .profile-btn-save {
+        color: #fff;
+        background: #e74c3c;
+        border: 1px solid #e74c3c;
+    }
+
+        .profile-btn-save:hover {
+            color: #fff;
+            background: #c0392b;
+        }
+
+    .profile-btn-back {
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+    }
+
+        .profile-btn-back:hover {
+            color: #1e293b;
+            background: #e2e8f0;
+        }
+
+    @@media (max-width: 650px) {
+        .profile-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-field-full {
+            grid-column: auto;
+        }
+
+        .profile-card-body {
+            padding: 18px;
+        }
+
+        .profile-actions .profile-btn {
+            flex: 1;
+        }
+
+        .profile-heading h2 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="profile-page">
+
+    <!-- TIÊU ĐỀ -->
+    <div class="profile-heading">
+        <h2>THÔNG TIN CÁ NHÂN</h2>
+        <p>Xem và cập nhật thông tin tài khoản ToyStore của bạn.</p>
+    </div>
+
+    <div class="profile-card">
+
+        <div class="profile-card-header">
+            <h4>
+                <i class="fa-solid fa-user-pen"></i>
+                Thông tin tài khoản
+            </h4>
+            <p>Kiểm tra và cập nhật thông tin liên hệ của bạn.</p>
+        </div>
+
+        <div class="profile-card-body">
+
+            <!-- THÔNG TIN TÀI KHOẢN -->
+            <div class="profile-account">
+
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="profile-account-info">
+                    <strong>@ViewBag.Username</strong>
+                    <span>Tài khoản khách hàng ToyStore</span>
+                </div>
+
+            </div>
+
+            @if (TempData["ProfileSuccess"] != null)
+            {
+                <div class="alert alert-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    @TempData["ProfileSuccess"]
+                </div>
+            }
+
+            @using (Html.BeginForm(
+                "InfoProfile",
+                "Login",
+                new { area = "" },
+                FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(
+                         true,
+                         "",
+                         new { @class = "text-danger" }
+                     )
+
+                <div class="profile-fields">
+
+                    <!-- HỌ VÀ TÊN -->
+                    <div class="profile-field">
+
+                        @Html.LabelFor(m => m.CustomerName)
+
+                        @Html.TextBoxFor(
+                                 m => m.CustomerName,
+                                 new
+                                 {
+                                     @class = "form-control",
+                                     placeholder = "Nhập họ và tên..."
+                                 }
+                             )
+
+                        @Html.ValidationMessageFor(
+                                 m => m.CustomerName,
+                                 "",
+                                 new { @class = "text-danger" }
+                             )
+
+                    </div>
+
+                    <!-- SỐ ĐIỆN THOẠI -->
+                    <div class="profile-field">
+
+                        @Html.LabelFor(m => m.CustomerPhone)
+
+                        @Html.TextBoxFor(
+                                 m => m.CustomerPhone,
+                                 new
+                                 {
+                                     @class = "form-control",
+                                     placeholder = "Nhập số điện thoại..."
+                                 }
+                             )
+
+                        @Html.ValidationMessageFor(
+                                 m => m.CustomerPhone,
+                                 "",
+                                 new { @class = "text-danger" }
+                             )
+
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="profile-field">
+
+                        @Html.LabelFor(m => m.CustomerEmail)
+
+                        @Html.TextBoxFor(
+                                 m => m.CustomerEmail,
+                                 new
+                                 {
+                                     @class = "form-control",
+                                     type = "email",
+                                     placeholder = "Nhập email..."
+                                 }
+                             )
+
+                        @Html.ValidationMessageFor(
+                                 m => m.CustomerEmail,
+                                 "",
+                                 new { @class = "text-danger" }
+                             )
+
+                    </div>
+
+                    <!-- TÊN TÀI KHOẢN -->
+                    <div class="profile-field">
+
+                        <label>Tên tài khoản</label>
+
+                        <input type="text"
+                               class="form-control"
+                               value="@ViewBag.Username"
+                               readonly />
+
+                    </div>
+
+                    <!-- ĐỊA CHỈ -->
+                    <div class="profile-field profile-field-full">
+
+                        @Html.LabelFor(m => m.CustomerAddress)
+
+                        @Html.TextAreaFor(
+                                 m => m.CustomerAddress,
+                                 new
+                                 {
+                                     @class = "form-control",
+                                     placeholder = "Nhập địa chỉ của bạn..."
+                                 }
+                             )
+
+                        @Html.ValidationMessageFor(
+                                 m => m.CustomerAddress,
+                                 "",
+                                 new { @class = "text-danger" }
+                             )
+
+                    </div>
+
+                </div>
+
+                <!-- NÚT THAO TÁC -->
+                <div class="profile-actions">
+
+                    @Html.ActionLink(
+                             "Quay lại trang chủ",
+                             "Index",
+                             "Home",
+                             new { area = "" },
+                             new { @class = "profile-btn profile-btn-back" }
+                         )
+
+                    <button type="submit" class="profile-btn profile-btn-save">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Lưu thay đổi
+                    </button>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

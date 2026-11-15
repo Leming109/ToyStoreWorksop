@@ -1,77 +1,423 @@
-﻿@model ToyStoreBE.Models.MyModel.AdminUserCreateViewModel
+﻿
+@model ToyStoreBE.Models.MyModel.AdminUserCreateViewModel
 
 @{
-    ViewBag.Title = "Thêm quản trị viên";
+    ViewBag.Title = "Tạo tài khoản Moderator";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
 }
 
-<div class="container mt-4" style="max-width: 600px;">
+<style>
+    .create-moderator-page {
+        max-width: 850px;
+        margin: 25px auto;
+        padding: 0 15px;
+        color: #1e293b;
+    }
 
-    <h2 class="mb-2">THÊM QUẢN TRỊ VIÊN</h2>
-    <p class="text-muted">Nhập thông tin tài khoản quản trị mới.</p>
+    .create-heading {
+        margin-bottom: 22px;
+    }
 
-    <hr />
+        .create-heading h2 {
+            margin: 0 0 8px;
+            color: #1e293b;
+            font-size: 26px;
+            font-weight: 700;
+        }
 
-    @using (Html.BeginForm("Create", "Users", FormMethod.Post))
+        .create-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+    .create-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+    }
+
+    .create-card-header {
+        padding: 20px 25px;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+        .create-card-header h3 {
+            margin: 0;
+            color: #9f3027;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+    .create-card-body {
+        padding: 26px;
+    }
+
+    .moderator-role-box {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 17px;
+        margin-bottom: 25px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+    }
+
+    .moderator-role-icon {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #1d4ed8;
+        background: #dbeafe;
+        border-radius: 10px;
+        font-size: 20px;
+    }
+
+    .moderator-role-info {
+        flex: 1;
+    }
+
+        .moderator-role-info strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+        .moderator-role-info span {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+    .moderator-badge {
+        display: inline-block;
+        padding: 6px 11px;
+        color: #1d4ed8;
+        background: #dbeafe;
+        border: 1px solid #bfdbfe;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .create-form-group {
+        margin-bottom: 21px;
+    }
+
+        .create-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+    .create-form-control {
+        width: 100%;
+        height: 46px;
+        padding: 10px 13px;
+        color: #334155;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+        transition: .2s;
+    }
+
+        .create-form-control:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, .12);
+        }
+
+    .create-form-group .text-danger {
+        display: block;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .create-validation-summary {
+        margin-bottom: 20px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .create-note {
+        padding: 13px 15px;
+        margin-top: 5px;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .create-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 18px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .create-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 18px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .create-btn-save {
+        color: #fff;
+        background: #e74c3c;
+        border-color: #e74c3c;
+    }
+
+        .create-btn-save:hover {
+            color: #fff;
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+
+    .create-btn-back {
+        color: #334155;
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+    }
+
+        .create-btn-back:hover {
+            color: #1e293b;
+            background: #cbd5e1;
+        }
+
+    @@media (max-width: 600px) {
+        .create-moderator-page {
+            padding: 0 5px;
+        }
+
+        .create-card-body {
+            padding: 18px;
+        }
+
+        .create-card-header {
+            padding: 18px;
+        }
+
+        .create-actions {
+            padding: 15px 18px;
+        }
+
+            .create-actions .create-btn {
+                flex: 1;
+            }
+
+        .moderator-role-box {
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<div class="create-moderator-page">
+
+    <!-- TIÊU ĐỀ -->
+    <div class="create-heading">
+
+        <h2>TẠO TÀI KHOẢN MODERATOR</h2>
+
+        <p>
+            Tạo tài khoản nhân viên để sử dụng hệ thống quản trị ToyStore.
+        </p>
+
+    </div>
+
+    @using (Html.BeginForm(
+        "Create",
+        "Users",
+        new { area = "Admin" },
+        FormMethod.Post,
+        new { @class = "create-moderator-form" }))
     {
         @Html.AntiForgeryToken()
 
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="create-card">
 
-        <div class="form-group mb-3">
-            @Html.LabelFor(m => m.Username)
+            <div class="create-card-header">
 
-            @Html.TextBoxFor(m => m.Username,
-                new
-                {
-                    @class = "form-control",
-                    placeholder = "Nhập tên tài khoản",
-                    autocomplete = "off"
-                })
+                <h3>
+                    <i class="fa-solid fa-user-plus"></i>
+                    Thông tin tài khoản mới
+                </h3>
 
-            @Html.ValidationMessageFor(
-                m => m.Username, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="create-card-body">
+
+                @Html.ValidationSummary(
+                         true,
+                         "",
+                         new { @class = "create-validation-summary" }
+                     )
+
+                <!-- VAI TRÒ ĐƯỢC CỐ ĐỊNH -->
+                <div class="moderator-role-box">
+
+                    <div class="moderator-role-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+
+                    <div class="moderator-role-info">
+
+                        <strong>Vai trò tài khoản</strong>
+
+                        <span>
+                            Tài khoản được tạo tại đây sẽ tự động có quyền
+                            Moderator. Chỉ SuperAdmin mới có quyền quản lý
+                            tài khoản này.
+                        </span>
+
+                    </div>
+
+                    <span class="moderator-badge">
+                        MODERATOR
+                    </span>
+
+                </div>
+
+                <!-- TÊN ĐĂNG NHẬP -->
+                <div class="create-form-group">
+
+                    @Html.LabelFor(
+                             m => m.Username,
+                             "Tên đăng nhập"
+                         )
+
+                    @Html.TextBoxFor(
+                             m => m.Username,
+                             new
+                             {
+                                 @class = "create-form-control",
+                                 placeholder = "Nhập tên đăng nhập...",
+                                 autocomplete = "off",
+                                 maxlength = "255"
+                             }
+                         )
+
+                    @Html.ValidationMessageFor(
+                             m => m.Username,
+                             "",
+                             new { @class = "text-danger" }
+                         )
+
+                </div>
+
+                <!-- MẬT KHẨU -->
+                <div class="create-form-group">
+
+                    @Html.LabelFor(
+                             m => m.Password,
+                             "Mật khẩu"
+                         )
+
+                    @Html.PasswordFor(
+                             m => m.Password,
+                             new
+                             {
+                                 @class = "create-form-control",
+                                 placeholder = "Nhập mật khẩu...",
+                                 autocomplete = "new-password"
+                             }
+                         )
+
+                    @Html.ValidationMessageFor(
+                             m => m.Password,
+                             "",
+                             new { @class = "text-danger" }
+                         )
+
+                </div>
+
+                <!-- XÁC NHẬN MẬT KHẨU -->
+                <div class="create-form-group">
+
+                    @Html.LabelFor(
+                             m => m.ConfirmPassword,
+                             "Xác nhận mật khẩu"
+                         )
+
+                    @Html.PasswordFor(
+                             m => m.ConfirmPassword,
+                             new
+                             {
+                                 @class = "create-form-control",
+                                 placeholder = "Nhập lại mật khẩu...",
+                                 autocomplete = "new-password"
+                             }
+                         )
+
+                    @Html.ValidationMessageFor(
+                             m => m.ConfirmPassword,
+                             "",
+                             new { @class = "text-danger" }
+                         )
+
+                </div>
+
+                <div class="create-note">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    Tài khoản mới sẽ được kích hoạt ngay sau khi tạo.
+                    SuperAdmin có thể khóa hoặc mở khóa tài khoản tại
+                    trang Quản lý tài khoản.
+
+                </div>
+
+            </div>
+
+            <!-- NÚT THAO TÁC -->
+            <div class="create-actions">
+
+                @Html.ActionLink(
+                         "Quay lại",
+                         "Index",
+                         "Users",
+                         new { area = "Admin" },
+                         new { @class = "create-btn create-btn-back" }
+                     )
+
+                <button type="submit" class="create-btn create-btn-save">
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Tạo tài khoản Moderator
+
+                </button>
+
+            </div>
+
         </div>
-
-        <div class="form-group mb-3">
-            @Html.LabelFor(m => m.Password)
-
-            @Html.PasswordFor(m => m.Password,
-                new
-                {
-                    @class = "form-control",
-                    placeholder = "Nhập mật khẩu"
-                })
-
-            @Html.ValidationMessageFor(
-                m => m.Password, "", new { @class = "text-danger" })
-        </div>
-
-        <div class="form-group mb-4">
-            @Html.LabelFor(m => m.ConfirmPassword)
-
-            @Html.PasswordFor(m => m.ConfirmPassword,
-                new
-                {
-                    @class = "form-control",
-                    placeholder = "Nhập lại mật khẩu"
-                })
-
-            @Html.ValidationMessageFor(
-                m => m.ConfirmPassword, "", new { @class = "text-danger" })
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Thêm tài khoản
-        </button>
-
-        @Html.ActionLink(
-            "Quay lại",
-            "Index",
-            "Users",
-            new { area = "Admin" },
-            new { @class = "btn btn-secondary ml-2" }
-        )
     }
 
 </div>

@@ -1,8 +1,21 @@
-﻿@model IEnumerable<ToyStoreBE.Models.User>
+﻿
+@model IEnumerable<ToyStoreBE.Models.User>
+
+@using System
+@using System.Linq
+@using System.Collections.Generic
 
 @{
-    ViewBag.Title = "Quản lý người quản trị";
+    ViewBag.Title = "Quản lý tài khoản";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    bool showRestricted =
+Convert.ToBoolean(ViewBag.ShowRestrictedUsersOverlay ?? false);
+
+    bool canManageUsers =
+        Convert.ToBoolean(ViewBag.CanManageUsers ?? false);
+
+    var users = Model ?? Enumerable.Empty<ToyStoreBE.Models.User>();
 }
 
 <style>
@@ -33,6 +46,27 @@
             font-size: 14px;
         }
 
+    /* NÚT TẠO MODERATOR */
+    .btn-create-moderator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 17px;
+        border-radius: 8px;
+        background: #e74c3c;
+        color: #fff !important;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: .2s;
+    }
+
+        .btn-create-moderator:hover {
+            background: #c0392b;
+        }
+
+    /* BẢNG */
     .admin-user-card {
         overflow: hidden;
         border: 1px solid #e2e8f0;
@@ -48,27 +82,28 @@
     }
 
         .admin-user-table thead {
-            background: #f1f5f9;
+            background: #fff1ef;
         }
 
         .admin-user-table th {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #475569;
+            padding: 16px 20px;
+            border-bottom: 1px solid #fecaca;
+            color: #9f3027;
             font-size: 13px;
             font-weight: 700;
             text-align: left;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .admin-user-table td {
-            padding: 16px 20px;
+            padding: 17px 20px;
             border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
         }
 
         .admin-user-table tbody tr:hover {
-            background: #f8fafc;
+            background: #fffafa;
         }
 
         .admin-user-table tbody tr:last-child td {
@@ -77,82 +112,113 @@
 
     .admin-username {
         font-weight: 600;
-        color: #334155;
+        color: #1e293b;
     }
 
+    /* NHÃN VAI TRÒ */
     .admin-role {
-        display: inline-block;
-        padding: 5px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
         border-radius: 20px;
-        background: #eff6ff;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .role-superadmin {
+        color: #b91c1c;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+    }
+
+    .role-moderator {
         color: #1d4ed8;
+        background: #dbeafe;
+        border: 1px solid #bfdbfe;
+    }
+
+    .role-unknown {
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* TRẠNG THÁI */
+    .account-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
+        border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        white-space: nowrap;
     }
 
-    .admin-user-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
+    .status-active {
+        color: #15803d;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
     }
 
-    .admin-user-btn {
+    .status-locked {
+        color: #dc2626;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+    }
+
+    /* NÚT KHÓA / MỞ KHÓA */
+    .account-action-form {
+        display: inline;
+        margin: 0;
+    }
+
+    .btn-account-action {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 7px 12px;
+        gap: 7px;
+        padding: 8px 12px;
         border: 1px solid transparent;
         border-radius: 7px;
         font-size: 13px;
         font-weight: 600;
-        text-decoration: none !important;
         cursor: pointer;
-        font-family: inherit;
+        transition: .2s;
     }
 
-    .admin-user-btn-edit {
-        border-color: #bfdbfe;
-        background: #eff6ff;
-        color: #1d4ed8;
-    }
-
-        .admin-user-btn-edit:hover {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-    .admin-user-btn-delete {
-        border-color: #fecaca;
-        background: #fef2f2;
+    .btn-lock {
         color: #dc2626;
+        background: #fef2f2;
+        border-color: #fecaca;
     }
 
-        .admin-user-btn-delete:hover {
-            background: #fee2e2;
-            color: #dc2626;
+        .btn-lock:hover {
+            color: white;
+            background: #dc2626;
         }
 
-    .admin-user-btn-create {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px 16px;
-        border-radius: 8px;
-        background: #2563eb;
-        color: #fff;
-        font-size: 14px;
+    .btn-unlock {
+        color: #15803d;
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+        .btn-unlock:hover {
+            color: white;
+            background: #15803d;
+        }
+
+    .protected-account {
+        color: #94a3b8;
+        font-size: 13px;
         font-weight: 600;
-        text-decoration: none !important;
     }
-
-        .admin-user-btn-create:hover {
-            background: #1d4ed8;
-            color: #fff;
-        }
 
     .admin-user-empty {
-        padding: 30px 20px !important;
+        padding: 40px 20px !important;
         color: #64748b;
         text-align: center;
     }
@@ -164,161 +230,428 @@
         font-size: 14px;
     }
 
-    .admin-user-delete-form {
-        display: inline;
-        margin: 0;
+    /* ================= MODERATOR OVERLAY ================= */
+
+    .restricted-page {
+        position: relative;
+        min-height: 490px;
+        overflow: hidden;
+        border-radius: 12px;
     }
 
-    @@media (max-width: 600px) {
+    .restricted-background {
+        min-height: 490px;
+        padding: 22px;
+        filter: blur(3px);
+        opacity: .55;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .restricted-placeholder-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .restricted-placeholder-button {
+        width: 160px;
+        height: 40px;
+        border-radius: 8px;
+        background: #e74c3c;
+    }
+
+    .restricted-placeholder-card {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .restricted-placeholder-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+        padding: 22px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .placeholder-line {
+        height: 13px;
+        max-width: 150px;
+        border-radius: 10px;
+        background: #cbd5e1;
+    }
+
+    .restricted-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, .28);
+    }
+
+    .restricted-dialog {
+        width: 100%;
+        max-width: 450px;
+        padding: 34px 30px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        box-shadow: 0 15px 45px rgba(15, 23, 42, .17);
+    }
+
+    .restricted-icon {
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 17px;
+        color: #dc2626;
+        background: #fef2f2;
+        border-radius: 50%;
+        font-size: 27px;
+    }
+
+    .restricted-dialog h3 {
+        margin: 0 0 12px;
+        color: #1e293b;
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .restricted-dialog p {
+        margin: 0 0 22px;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .btn-back-dashboard {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        color: white !important;
+        background: #e74c3c;
+        text-decoration: none !important;
+        font-size: 14px;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+        .btn-back-dashboard:hover {
+            background: #c0392b;
+        }
+
+    @@media (max-width: 700px) {
         .admin-user-page {
             padding: 15px 10px;
         }
 
-        .admin-user-table th,
-        .admin-user-table td {
-            padding: 12px 10px;
-        }
-
         .admin-user-header h2 {
             font-size: 22px;
+        }
+
+        .admin-user-table th,
+        .admin-user-table td {
+            padding: 13px 10px;
+        }
+
+        .restricted-dialog {
+            padding: 25px 18px;
         }
     }
 </style>
 
 <div class="admin-user-page">
 
-    <!-- TIÊU ĐỀ VÀ NÚT THÊM -->
-    <div class="admin-user-header">
-        <div>
-            <h2>DANH SÁCH NGƯỜI QUẢN TRỊ</h2>
-            <p>Quản lý các tài khoản có quyền quản trị hệ thống.</p>
-        </div>
-
-        @Html.ActionLink(
-            "＋ Thêm quản trị viên",
-            "Create",
-            "Users",
-            new { area = "Admin" },
-            new { @class = "admin-user-btn-create" }
-        )
-    </div>
-
-    <!-- THÔNG BÁO THÀNH CÔNG -->
-    @if (TempData["Success"] != null)
+    @if (showRestricted)
     {
-        <div class="alert alert-success admin-user-alert">
-            @TempData["Success"]
+        <!-- GIAO DIỆN DÀNH CHO MODERATOR -->
+        <!-- Không hiển thị dữ liệu tài khoản thật -->
+
+        <div class="restricted-page">
+
+            <div class="restricted-background">
+
+                <div class="restricted-placeholder-header">
+
+                    <div>
+                        <h2>DANH SÁCH NGƯỜI DÙNG</h2>
+                        <p>Quản lý các tài khoản quản trị hệ thống.</p>
+                    </div>
+
+                    <div class="restricted-placeholder-button"></div>
+
+                </div>
+
+                <div class="restricted-placeholder-card">
+
+                    <div class="restricted-placeholder-row">
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                    </div>
+
+                    <div class="restricted-placeholder-row">
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                    </div>
+
+                    <div class="restricted-placeholder-row">
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="restricted-overlay">
+
+                <div class="restricted-dialog">
+
+                    <div class="restricted-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <h3>BẠN KHÔNG CÓ QUYỀN TRUY CẬP</h3>
+
+                    <p>
+                        Tài khoản Moderator không được phép sử dụng
+                        chức năng quản lý người dùng.
+                        <br />
+                        Vui lòng liên hệ SuperAdmin nếu bạn cần hỗ trợ.
+                    </p>
+
+                    <a href="@Url.Action("Index", "Admin", new { area = "Admin" })"
+                       class="btn-back-dashboard">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Quay lại Dashboard
+
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
     }
-
-    <!-- THÔNG BÁO LỖI -->
-    @if (TempData["Error"] != null)
+    else
     {
-        <div class="alert alert-danger admin-user-alert">
-            @TempData["Error"]
+        <!-- GIAO DIỆN DÀNH CHO SUPERADMIN -->
+
+        <div class="admin-user-header">
+
+            <div>
+                <h2>QUẢN LÝ TÀI KHOẢN</h2>
+                <p>
+                    Quản lý SuperAdmin, Moderator và trạng thái tài khoản.
+                </p>
+            </div>
+
+            @if (canManageUsers)
+            {
+                <a href="@Url.Action("Create", "Users", new { area = "Admin" })"
+                   class="btn-create-moderator">
+
+                    <i class="fa-solid fa-user-plus"></i>
+                    Tạo tài khoản Moderator
+
+                </a>
+            }
+
         </div>
-    }
 
-    <!-- BẢNG DANH SÁCH -->
-    <div class="admin-user-card">
-        <div class="table-responsive">
+        <!-- THÔNG BÁO -->
+        if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success admin-user-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                @TempData["Success"]
+            </div>
+        }
 
-            <table class="admin-user-table">
+        if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger admin-user-alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                @TempData["Error"]
+            </div>
+        }
 
-                <thead>
-                    <tr>
-                        <th>Tên tài khoản</th>
-                        <th>Vai trò</th>
-                        <th style="width: 220px;">Thao tác</th>
-                    </tr>
-                </thead>
+        <!-- BẢNG TÀI KHOẢN -->
+        <div class="admin-user-card">
 
-                <tbody>
+            <div class="table-responsive">
 
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var item in Model)
+                <table class="admin-user-table">
+
+                    <thead>
+                        <tr>
+                            <th>Tên tài khoản</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (users.Any())
                         {
-                            <tr>
+                            foreach (var item in users)
+                            {
+                                string role = (item.UserRole ?? "").Trim();
 
-                                <!-- TÊN TÀI KHOẢN -->
-                                <td>
-                                    <span class="admin-username">
-                                        @item.Username.TrimEnd()
-                                    </span>
-                                </td>
+                                <tr>
 
-                                <!-- VAI TRÒ -->
-                                <td>
-                                    <span class="admin-role">
-                                        Quản trị viên
-                                    </span>
-                                </td>
+                                    <!-- TÀI KHOẢN -->
+                                    <td>
+                                        <span class="admin-username">
+                                            @item.Username.TrimEnd()
+                                        </span>
+                                    </td>
 
-                                <!-- THAO TÁC -->
-                                <td>
-                                    <div class="admin-user-actions">
+                                    <!-- VAI TRÒ -->
+                                    <td>
 
-                                        <!-- NÚT SỬA -->
-                                        @Html.ActionLink(
-                                            "Sửa",
-                                            "Edit",
-                                            "Users",
-                                            new
-                                            {
-                                                area = "Admin",
-                                                id = item.Username.TrimEnd()
-                                            },
-                                            new
-                                            {
-                                                @class = "admin-user-btn admin-user-btn-edit"
-                                            }
-                                        )
-
-                                        <!-- NÚT XÓA -->
-                                        @using (Html.BeginForm(
-                                            "Delete",
-                                            "Users",
-                                            new
-                                            {
-                                                area = "Admin",
-                                                id = item.Username.TrimEnd()
-                                            },
-                                            FormMethod.Post,
-                                            new
-                                            {
-                                                @class = "admin-user-delete-form",
-                                                onsubmit = "return confirm('Bạn có chắc chắn muốn xóa tài khoản quản trị này không?');"
-                                            }))
+                                        @if (role == "A")
                                         {
-                                            @Html.AntiForgeryToken()
-
-                                            <button type="submit"
-                                                    class="admin-user-btn admin-user-btn-delete">
-                                                Xóa
-                                            </button>
+                                            <span class="admin-role role-superadmin">
+                                                <i class="fa-solid fa-crown"></i>
+                                                SuperAdmin
+                                            </span>
+                                        }
+                                        else if (role == "M")
+                                        {
+                                            <span class="admin-role role-moderator">
+                                                <i class="fa-solid fa-user-tie"></i>
+                                                Moderator
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="admin-role role-unknown">
+                                                Không xác định
+                                            </span>
                                         }
 
-                                    </div>
-                                </td>
+                                    </td>
 
+                                    <!-- TRẠNG THÁI -->
+                                    <td>
+
+                                        @if (item.IsLocked)
+                                        {
+                                            <span class="account-status status-locked">
+                                                <i class="fa-solid fa-lock"></i>
+                                                Đã khóa
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="account-status status-active">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Đang hoạt động
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- THAO TÁC -->
+                                    <td>
+
+                                        @if (role == "M" && canManageUsers)
+                                        {
+                                            using (Html.BeginForm(
+                                                "ToggleLock",
+                                                "Users",
+                                                new
+                                                {
+                                                    area = "Admin",
+                                                    id = item.Username.TrimEnd()
+                                                },
+                                                FormMethod.Post,
+                                                new
+                                                {
+                                                    @class = "account-action-form",
+                                                    onsubmit = "return confirm('Bạn có chắc chắn muốn " +
+                                                        (item.IsLocked ? "mở khóa" : "khóa") +
+                                                        " tài khoản Moderator này không?');"
+                                                }))
+                                            {
+                                                @Html.AntiForgeryToken()
+
+                                                if (item.IsLocked)
+                                                {
+                                                    <button type="submit"
+                                                            class="btn-account-action btn-unlock">
+                                                        <i class="fa-solid fa-lock-open"></i>
+                                                        Mở khóa
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit"
+                                                            class="btn-account-action btn-lock">
+                                                        <i class="fa-solid fa-lock"></i>
+                                                        Khóa tài khoản
+                                                    </button>
+                                                }
+                                            }
+                                        }
+                                        else if (role == "A")
+                                        {
+                                            <span class="protected-account">
+                                                <i class="fa-solid fa-shield-halved"></i>
+                                                Tài khoản được bảo vệ
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="protected-account">—</span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="admin-user-empty">
+
+                                    <i class="fa-solid fa-users"
+                                       style="font-size:30px; margin-bottom:12px;"></i>
+
+                                    <div>Chưa có tài khoản quản trị nào.</div>
+
+                                </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="3" class="admin-user-empty">
-                                Chưa có tài khoản quản trị nào.
-                            </td>
-                        </tr>
-                    }
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
-    </div>
+    }
 
 </div>

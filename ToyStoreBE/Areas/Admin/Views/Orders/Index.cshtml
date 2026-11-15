@@ -1,8 +1,18 @@
-﻿@model IEnumerable<ToyStoreBE.Models.Order>
+﻿
+@model IEnumerable<ToyStoreBE.Models.Order>
+
+@using System
+@using System.Linq
 
 @{
     ViewBag.Title = "Quản lý đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    int totalOrders = Model == null ? 0 : Model.Count();
+
+    decimal totalOrderValue = Model == null
+        ? 0m
+        : Model.Sum(o => o.TotalAmount);
 }
 
 <style>
@@ -11,6 +21,7 @@
         color: #1e293b;
     }
 
+    /* HEADER */
     .order-header {
         margin-bottom: 25px;
     }
@@ -28,6 +39,7 @@
             font-size: 14px;
         }
 
+    /* ORDER CARD */
     .order-card {
         overflow: hidden;
         background: #fff;
@@ -49,8 +61,10 @@
             font-weight: 700;
         }
 
+    /* TABLE */
     .order-table {
         width: 100%;
+        min-width: 1050px;
         margin: 0;
         border-collapse: collapse;
     }
@@ -60,9 +74,9 @@
         }
 
         .order-table th {
-            padding: 15px 18px;
+            padding: 15px 16px;
             color: #475569;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             text-align: left;
             text-transform: uppercase;
@@ -71,7 +85,7 @@
         }
 
         .order-table td {
-            padding: 16px 18px;
+            padding: 16px;
             border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
             font-size: 14px;
@@ -85,6 +99,7 @@
             border-bottom: none;
         }
 
+    /* ORDER INFORMATION */
     .order-id {
         color: #c0392b;
         font-weight: 700;
@@ -93,10 +108,12 @@
     .order-customer {
         color: #334155;
         font-weight: 600;
+        min-width: 130px;
     }
 
     .order-date {
         color: #64748b;
+        white-space: nowrap;
     }
 
     .order-money {
@@ -105,18 +122,72 @@
         white-space: nowrap;
     }
 
-    .order-status {
-        display: inline-block;
+    /* PAYMENT METHOD */
+    .order-payment {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         padding: 6px 11px;
-        color: #c0392b;
-        background: #fff1ef;
-        border: 1px solid #fecaca;
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
     }
 
+    /* ORDER STATUS */
+    .order-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 11px;
+        border: 1px solid transparent;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        color: #a16207;
+        background: #fef9c3;
+        border-color: #fde68a;
+    }
+
+    .status-confirmed {
+        color: #1d4ed8;
+        background: #dbeafe;
+        border-color: #bfdbfe;
+    }
+
+    .status-preparing {
+        color: #0369a1;
+        background: #e0f2fe;
+        border-color: #bae6fd;
+    }
+
+    .status-shipping {
+        color: #7e22ce;
+        background: #f3e8ff;
+        border-color: #e9d5ff;
+    }
+
+    .status-delivered {
+        color: #15803d;
+        background: #dcfce7;
+        border-color: #bbf7d0;
+    }
+
+    .status-cancelled {
+        color: #dc2626;
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    /* DETAIL BUTTON */
     .btn-order-detail {
         display: inline-flex;
         align-items: center;
@@ -140,6 +211,7 @@
             border-color: #c0392b;
         }
 
+    /* EMPTY */
     .order-empty {
         padding: 45px 20px !important;
         color: #94a3b8;
@@ -153,6 +225,7 @@
             font-size: 35px;
         }
 
+    /* SUMMARY */
     .order-summary {
         display: flex;
         justify-content: space-between;
@@ -168,6 +241,13 @@
             color: #c0392b;
             font-size: 16px;
         }
+
+    /* ALERT */
+    .order-alert {
+        margin-bottom: 18px;
+        padding: 12px 16px;
+        border-radius: 8px;
+    }
 
     @@media (max-width: 768px) {
         .order-page {
@@ -190,20 +270,26 @@
     <!-- HEADER -->
     <div class="order-header">
         <h2>QUẢN LÝ ĐƠN HÀNG</h2>
-        <p>Theo dõi và tra cứu các đơn hàng của khách hàng tại ToyStore.</p>
+
+        <p>
+            Theo dõi đơn hàng, phương thức thanh toán
+            và trạng thái xử lý tại ToyStore.
+        </p>
     </div>
 
     <!-- THÔNG BÁO -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success order-alert">
+            <i class="fa-solid fa-circle-check"></i>
             @TempData["Success"]
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger order-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
             @TempData["Error"]
         </div>
     }
@@ -229,6 +315,7 @@
                         <th>Ngày đặt hàng</th>
                         <th>Tổng tiền</th>
                         <th>Thanh toán</th>
+                        <th>Trạng thái đơn hàng</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -239,14 +326,56 @@
                     {
                         foreach (var item in Model)
                         {
+                            string status = string.IsNullOrWhiteSpace(item.OrderStatus)
+                                ? "Chờ xác nhận"
+                                : item.OrderStatus.Trim();
+
+                            string statusClass = "status-pending";
+                            string statusIcon = "fa-clock";
+
+                            switch (status)
+                            {
+                                case "Chờ xác nhận":
+                                    statusClass = "status-pending";
+                                    statusIcon = "fa-clock";
+                                    break;
+
+                                case "Đã xác nhận":
+                                    statusClass = "status-confirmed";
+                                    statusIcon = "fa-circle-check";
+                                    break;
+
+                                case "Đang chuẩn bị hàng":
+                                    statusClass = "status-preparing";
+                                    statusIcon = "fa-box";
+                                    break;
+
+                                case "Đang giao hàng":
+                                    statusClass = "status-shipping";
+                                    statusIcon = "fa-truck";
+                                    break;
+
+                                case "Đã giao hàng":
+                                    statusClass = "status-delivered";
+                                    statusIcon = "fa-check-double";
+                                    break;
+
+                                case "Đã hủy":
+                                    statusClass = "status-cancelled";
+                                    statusIcon = "fa-ban";
+                                    break;
+                            }
+
                             <tr>
 
+                                <!-- MÃ ĐƠN HÀNG -->
                                 <td>
                                     <span class="order-id">
                                         #@item.OrderID
                                     </span>
                                 </td>
 
+                                <!-- KHÁCH HÀNG -->
                                 <td>
                                     <span class="order-customer">
                                         @(item.Customer != null
@@ -255,41 +384,55 @@
                                     </span>
                                 </td>
 
+                                <!-- NGÀY ĐẶT -->
                                 <td>
                                     <span class="order-date">
                                         @item.OrderDate.ToString("dd/MM/yyyy HH:mm")
                                     </span>
                                 </td>
 
+                                <!-- TỔNG TIỀN -->
                                 <td>
                                     <span class="order-money">
                                         @item.TotalAmount.ToString("N0") đ
                                     </span>
                                 </td>
 
+                                <!-- PHƯƠNG THỨC THANH TOÁN -->
                                 <td>
-                                    <span class="order-status">
+                                    <span class="order-payment">
                                         @(string.IsNullOrWhiteSpace(item.PaymentStatus)
                                             ? "Chưa cập nhật"
                                             : item.PaymentStatus)
                                     </span>
                                 </td>
 
+                                <!-- TRẠNG THÁI ĐƠN HÀNG -->
                                 <td>
+                                    <span class="order-status @statusClass">
+                                        <i class="fa-solid @statusIcon"></i>
+                                        @status
+                                    </span>
+                                </td>
+
+                                <!-- THAO TÁC -->
+                                <td>
+
                                     @Html.ActionLink(
-                                        "Chi tiết",
-                                        "Details",
-                                        "Orders",
-                                        new
-                                        {
-                                            area = "Admin",
-                                            id = item.OrderID
-                                        },
-                                        new
-                                        {
-                                            @class = "btn-order-detail"
-                                        }
-                                    )
+                                             "Chi tiết",
+                                             "Details",
+                                             "Orders",
+                                             new
+                                             {
+                                                 area = "Admin",
+                                                 id = item.OrderID
+                                             },
+                                             new
+                                             {
+                                                 @class = "btn-order-detail"
+                                             }
+                                         )
+
                                 </td>
 
                             </tr>
@@ -298,7 +441,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="6" class="order-empty">
+                            <td colspan="7" class="order-empty">
                                 <i class="fa-solid fa-box-open"></i>
                                 Chưa có đơn hàng nào trong hệ thống.
                             </td>
@@ -316,16 +459,12 @@
 
             <span>
                 Tổng số đơn hàng:
-                <strong>@(Model == null ? 0 : Model.Count())</strong>
+                <strong>@totalOrders</strong>
             </span>
 
             <span>
                 Tổng giá trị đơn hàng:
-                <strong>
-                    @(Model == null
-                        ? "0"
-                        : Model.Sum(o => o.TotalAmount).ToString("N0")) đ
-                </strong>
+                <strong>@totalOrderValue.ToString("N0") đ</strong>
             </span>
 
         </div>

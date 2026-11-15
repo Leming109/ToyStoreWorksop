@@ -1,0 +1,473 @@
+﻿@model ToyStoreBE.Models.Order
+@using System.Globalization
+
+@{
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<style>
+    .order-invoice-card {
+        max-width: 950px;
+        margin: 0 auto;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(15,23,42,.06);
+        color: #334155;
+    }
+
+    .order-invoice-top {
+        height: 7px;
+        background: #e74c3c;
+    }
+
+    .order-invoice-content {
+        padding: 35px 40px;
+    }
+
+    .order-invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .order-invoice-brand h2 {
+        margin: 0 0 8px;
+        color: #333;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+        .order-invoice-brand h2 span {
+            color: #e74c3c;
+        }
+
+    .order-invoice-brand p,
+    .order-invoice-number p {
+        margin: 5px 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .order-invoice-number {
+        text-align: right;
+    }
+
+        .order-invoice-number h3 {
+            margin: 0 0 10px;
+            color: #c0392b;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+    .order-invoice-section {
+        margin-top: 28px;
+    }
+
+    .order-invoice-section-title {
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        color: #c0392b;
+        font-size: 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+    .order-invoice-customer {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 30px;
+    }
+
+    .order-invoice-info label {
+        display: block;
+        margin-bottom: 6px;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .order-invoice-info p {
+        margin: 0;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .order-invoice-table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+    }
+
+        .order-invoice-table thead {
+            background: #fff1ef;
+        }
+
+        .order-invoice-table th {
+            padding: 13px 12px;
+            color: #9f3027;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            border-bottom: 1px solid #fecaca;
+        }
+
+        .order-invoice-table td {
+            padding: 15px 12px;
+            color: #475569;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+    .order-invoice-product-name {
+        color: #334155;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .order-invoice-note {
+        margin-top: 5px;
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .order-invoice-money {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .order-invoice-status {
+        display: inline-block;
+        padding: 6px 12px;
+        color: #c0392b;
+        background: #fff1ef;
+        border: 1px solid #fecaca;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .order-invoice-total {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
+
+    .order-invoice-total-box {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .order-invoice-total-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 10px 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .order-invoice-final {
+        margin-top: 5px;
+        padding-top: 16px;
+        color: #c0392b;
+        font-size: 19px;
+        font-weight: 800;
+        border-top: 2px solid #fecaca;
+    }
+
+    .order-invoice-thanks {
+        margin-top: 35px;
+        padding-top: 22px;
+        color: #64748b;
+        text-align: center;
+        border-top: 1px dashed #cbd5e1;
+    }
+
+        .order-invoice-thanks h4 {
+            margin: 0 0 8px;
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .order-invoice-thanks p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+    .order-invoice-empty {
+        padding: 25px !important;
+        text-align: center;
+        color: #94a3b8 !important;
+    }
+
+    @@media (max-width: 650px) {
+        .order-invoice-content {
+            padding: 22px 15px;
+        }
+
+        .order-invoice-number {
+            text-align: left;
+        }
+
+        .order-invoice-customer {
+            grid-template-columns: 1fr;
+        }
+
+        .order-invoice-table th,
+        .order-invoice-table td {
+            padding: 10px 7px;
+            font-size: 11px;
+        }
+
+        .order-invoice-product-name {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<div class="order-invoice-card">
+
+    <div class="order-invoice-top"></div>
+
+    <div class="order-invoice-content">
+
+        <!-- HEADER HÓA ĐƠN -->
+        <div class="order-invoice-header">
+
+            <div class="order-invoice-brand">
+                <h2>TOY<span>STORE</span></h2>
+                <p>Cửa hàng đồ chơi và mô hình</p>
+                <p>Cảm ơn bạn đã lựa chọn ToyStore.</p>
+            </div>
+
+            <div class="order-invoice-number">
+
+                <h3>HÓA ĐƠN</h3>
+
+                <p>
+                    Mã đơn hàng:
+                    <strong>#@Model.OrderID</strong>
+                </p>
+
+                <p>
+                    Ngày đặt:
+                    <strong>
+                        @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                    </strong>
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- THÔNG TIN KHÁCH HÀNG -->
+        <div class="order-invoice-section">
+
+            <div class="order-invoice-section-title">
+                <i class="fa-solid fa-user"></i>
+                THÔNG TIN KHÁCH HÀNG
+            </div>
+
+            <div class="order-invoice-customer">
+
+                <div class="order-invoice-info">
+                    <label>Họ và tên</label>
+                    <p>
+                        @(Model.Customer != null
+                            ? Model.Customer.CustomerName
+                            : "Không xác định")
+                    </p>
+                </div>
+
+                <div class="order-invoice-info">
+                    <label>Số điện thoại</label>
+                    <p>
+                        @(Model.Customer != null
+                            ? Model.Customer.CustomerPhone
+                            : "Không có thông tin")
+                    </p>
+                </div>
+
+                <div class="order-invoice-info">
+                    <label>Email</label>
+                    <p>
+                        @(Model.Customer != null
+                            ? Model.Customer.CustomerEmail
+                            : "Không có thông tin")
+                    </p>
+                </div>
+
+                <div class="order-invoice-info">
+                    <label>Địa chỉ khách hàng</label>
+                    <p>
+                        @(Model.Customer != null
+                            ? Model.Customer.CustomerAddress
+                            : "Không có thông tin")
+                    </p>
+                </div>
+
+                <div class="order-invoice-info">
+                    <label>Địa chỉ giao hàng</label>
+                    <p>@Model.AddressDelivery</p>
+                </div>
+
+                <div class="order-invoice-info">
+                    <label>Thông tin thanh toán</label>
+                    <p>
+                        <span class="order-invoice-status">
+                            @(string.IsNullOrWhiteSpace(Model.PaymentStatus)
+                                ? "Chưa cập nhật"
+                                : Model.PaymentStatus)
+                        </span>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SẢN PHẨM -->
+        <div class="order-invoice-section">
+
+            <div class="order-invoice-section-title">
+                <i class="fa-solid fa-box-open"></i>
+                DANH SÁCH SẢN PHẨM
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="order-invoice-table">
+
+                    <thead>
+                        <tr>
+                            <th style="width: 42%;">Sản phẩm</th>
+                            <th style="width: 12%; text-align:center;">SL</th>
+                            <th style="width: 22%; text-align:right;">Đơn giá</th>
+                            <th style="width: 24%; text-align:right;">Thành tiền</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.OrderDetails != null &&
+                             Model.OrderDetails.Any())
+                        {
+                            foreach (var item in Model.OrderDetails)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <div class="order-invoice-product-name">
+                                            @(item.Product != null
+                                                ? item.Product.ProductName
+                                                : "Sản phẩm không tồn tại")
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(item.Note))
+                                        {
+                                            <div class="order-invoice-note">
+                                                Ghi chú: @item.Note
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <td style="text-align:center;">
+                                        @item.Quantity
+                                    </td>
+
+                                    <td style="text-align:right;">
+                                        <span class="order-invoice-money">
+                                            @string.Format(
+                                                     culture,
+                                                     "{0:N0} ₫",
+                                                     item.UnitPrice)
+                                        </span>
+                                    </td>
+
+                                    <td style="text-align:right;">
+                                        <span class="order-invoice-money">
+                                            @string.Format(
+                                                     culture,
+                                                     "{0:N0} ₫",
+                                                     item.UnitPrice * item.Quantity)
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="order-invoice-empty">
+                                    Đơn hàng chưa có sản phẩm chi tiết.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- TỔNG THANH TOÁN -->
+        <div class="order-invoice-total">
+
+            <div class="order-invoice-total-box">
+
+                <div class="order-invoice-total-row">
+                    <span>Tổng số lượng sản phẩm</span>
+
+                    <strong>
+                        @(Model.OrderDetails == null
+                            ? 0
+                            : Model.OrderDetails.Sum(d => d.Quantity))
+                    </strong>
+                </div>
+
+                <div class="order-invoice-total-row order-invoice-final">
+
+                    <span>TỔNG THANH TOÁN</span>
+
+                    <span>
+                        @string.Format(
+                                 culture,
+                                 "{0:N0} ₫",
+                                 Model.TotalAmount)
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CẢM ƠN -->
+        <div class="order-invoice-thanks">
+
+            <h4>CẢM ƠN QUÝ KHÁCH!</h4>
+
+            <p>
+                ToyStore rất hân hạnh được phục vụ quý khách.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>

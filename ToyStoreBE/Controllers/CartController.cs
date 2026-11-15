@@ -423,6 +423,7 @@ namespace ToyStoreBE.Controllers
                         OrderDate = DateTime.Now,
                         TotalAmount = totalAmount,
                         PaymentStatus = "COD",
+                        OrderStatus = "Chờ xác nhận",
                         AddressDelivery = model.CustomerAddress.Trim()
                     };
 

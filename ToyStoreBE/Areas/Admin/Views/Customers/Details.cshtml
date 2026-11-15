@@ -1,59 +1,521 @@
-﻿@model ToyStoreBE.Models.Customer
+﻿
+@model ToyStoreBE.Models.Customer
+
+@using System.Linq
+@using System.Collections.Generic
+@using System.Globalization
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Chi tiết khách hàng";
     Layout = "~/Areas/Admin/Views/Shared/_AdminsLayout.cshtml";
+
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+
+    var orders = Model.Orders == null
+        ? new List<ToyStoreBE.Models.Order>()
+        : Model.Orders.OrderByDescending(o => o.OrderDate).ToList();
+
+    int totalOrders = orders.Count;
+
+    decimal totalSpent = orders.Sum(o => o.TotalAmount);
 }
 
-<h2>Details</h2>
+<style>
+    .customer-detail-page {
+        padding: 22px 25px;
+        color: #1e293b;
+    }
 
-<div>
-    <h4>Customer</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerName)
-        </dt>
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerName)
-        </dd>
+        .detail-header h2 {
+            margin: 0 0 7px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+        }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerPhone)
-        </dt>
+        .detail-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerPhone)
-        </dd>
+    .btn-back-customer {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background: #fff1ef;
+        border: 1px solid #fecaca;
+        color: #c0392b !important;
+        text-decoration: none !important;
+        font-size: 13px;
+        font-weight: 600;
+    }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerEmail)
-        </dt>
+        .btn-back-customer:hover {
+            background: #e74c3c;
+            color: white !important;
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerEmail)
-        </dd>
+    /* CUSTOMER INFORMATION */
+    .customer-info-card {
+        padding: 23px;
+        margin-bottom: 22px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        box-shadow: 0 4px 15px rgba(15,23,42,.04);
+    }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.CustomerAddress)
-        </dt>
+        .customer-info-card h3 {
+            margin: 0 0 20px;
+            color: #c0392b;
+            font-size: 18px;
+            font-weight: 700;
+        }
 
-        <dd>
-            @Html.DisplayFor(model => model.CustomerAddress)
-        </dd>
+    .customer-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 30px;
+    }
 
-        <dt>
-            @Html.DisplayNameFor(model => model.User.Password)
-        </dt>
+    .customer-info-item label {
+        display: block;
+        margin-bottom: 6px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 
-        <dd>
-            @Html.DisplayFor(model => model.User.Password)
-        </dd>
+    .customer-info-item strong {
+        display: block;
+        color: #1e293b;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
 
-    </dl>
+    /* STATISTICS */
+    .customer-order-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .order-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 19px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(15,23,42,.04);
+    }
+
+    .order-stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: #c0392b;
+        background: #fff1ef;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .order-stat-info span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .order-stat-info strong {
+        display: block;
+        margin-top: 5px;
+        color: #1e293b;
+        font-size: 21px;
+    }
+
+    /* ORDER HISTORY */
+    .order-history-title {
+        margin: 0 0 17px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .order-history-card {
+        margin-bottom: 18px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(15,23,42,.04);
+    }
+
+    .order-history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 17px 20px;
+        background: #fff7f7;
+        border-bottom: 1px solid #fee2e2;
+    }
+
+        .order-history-header strong {
+            color: #9f3027;
+            font-size: 15px;
+        }
+
+    .order-history-meta {
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .order-status {
+        display: inline-block;
+        padding: 6px 10px;
+        background: #fef9c3;
+        color: #a16207;
+        border: 1px solid #fde68a;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .order-items-wrapper {
+        overflow-x: auto;
+    }
+
+    .order-items-table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+    }
+
+        .order-items-table th {
+            padding: 13px 15px;
+            background: #f8fafc;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .order-items-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+    .order-product-name {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .order-price {
+        color: #dc2626 !important;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 15px;
+        padding: 16px 20px;
+        background: #fafafa;
+        border-top: 1px solid #e2e8f0;
+    }
+
+        .order-total span {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .order-total strong {
+            color: #dc2626;
+            font-size: 18px;
+        }
+
+    .order-note {
+        padding: 12px 18px;
+        color: #64748b;
+        font-size: 12px;
+        background: #fafafa;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .customer-no-orders {
+        padding: 50px 20px;
+        text-align: center;
+        color: #94a3b8;
+        background: #fff;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+    }
+
+        .customer-no-orders i {
+            display: block;
+            margin-bottom: 13px;
+            font-size: 35px;
+        }
+
+    @@media(max-width: 650px) {
+        .customer-detail-page {
+            padding: 15px 10px;
+        }
+
+        .customer-info-grid,
+        .customer-order-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="customer-detail-page">
+
+    <!-- HEADER -->
+    <div class="detail-header">
+
+        <div>
+            <h2>CHI TIẾT KHÁCH HÀNG</h2>
+            <p>Thông tin cá nhân và lịch sử mua hàng.</p>
+        </div>
+
+        @Html.ActionLink(
+                 "Quay lại danh sách",
+                 "Index",
+                 "Customers",
+                 new { area = "Admin" },
+                 new { @class = "btn-back-customer" }
+             )
+
+    </div>
+
+    <!-- CUSTOMER INFORMATION -->
+    <div class="customer-info-card">
+
+        <h3>
+            <i class="fa-solid fa-user"></i>
+            Thông tin khách hàng
+        </h3>
+
+        <div class="customer-info-grid">
+
+            <div class="customer-info-item">
+                <label>Tên tài khoản</label>
+                <strong>@Model.Username</strong>
+            </div>
+
+            <div class="customer-info-item">
+                <label>Họ và tên</label>
+                <strong>@Model.CustomerName</strong>
+            </div>
+
+            <div class="customer-info-item">
+                <label>Số điện thoại</label>
+                <strong>@Model.CustomerPhone</strong>
+            </div>
+
+            <div class="customer-info-item">
+                <label>Email</label>
+                <strong>
+                    @(string.IsNullOrWhiteSpace(Model.CustomerEmail)
+                        ? "Chưa cập nhật"
+                        : Model.CustomerEmail)
+                </strong>
+            </div>
+
+            <div class="customer-info-item">
+                <label>Địa chỉ</label>
+                <strong>
+                    @(string.IsNullOrWhiteSpace(Model.CustomerAddress)
+                        ? "Chưa cập nhật"
+                        : Model.CustomerAddress)
+                </strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="customer-order-stats">
+
+        <div class="order-stat-card">
+
+            <div class="order-stat-icon">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+
+            <div class="order-stat-info">
+                <span>Tổng số đơn hàng</span>
+                <strong>@totalOrders</strong>
+            </div>
+
+        </div>
+
+        <div class="order-stat-card">
+
+            <div class="order-stat-icon">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+
+            <div class="order-stat-info">
+                <span>Tổng giá trị đơn hàng</span>
+                <strong>@totalSpent.ToString("N0", culture) ₫</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <h3 class="order-history-title">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Lịch sử mua hàng
+    </h3>
+
+    @if (orders.Any())
+    {
+        foreach (var order in orders)
+        {
+            <div class="order-history-card">
+
+                <div class="order-history-header">
+
+                    <div>
+                        <strong>Đơn hàng #@order.OrderID</strong>
+
+                        <div class="order-history-meta">
+                            <i class="fa-regular fa-calendar"></i>
+                            @order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="order-status">
+                            @(string.IsNullOrWhiteSpace(order.OrderStatus)
+                                ? "Chờ xác nhận"
+                                : order.OrderStatus)
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="order-items-wrapper">
+
+                    <table class="order-items-table">
+
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if (order.OrderDetails != null &&
+                                 order.OrderDetails.Any())
+                            {
+                                foreach (var detail in order.OrderDetails)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <span class="order-product-name">
+                                                @(detail.Product != null
+                                                    ? detail.Product.ProductName
+                                                    : "Sản phẩm không còn tồn tại")
+                                            </span>
+                                        </td>
+
+                                        <td>@detail.Quantity</td>
+
+                                        <td class="order-price">
+                                            @detail.UnitPrice.ToString("N0", culture) ₫
+                                        </td>
+
+                                        <td class="order-price">
+                                            @((detail.UnitPrice * detail.Quantity).ToString("N0", culture)) ₫
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4">
+                                        Không có chi tiết sản phẩm trong đơn hàng.
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="order-total">
+                    <span>Tổng đơn hàng:</span>
+
+                    <strong>
+                        @order.TotalAmount.ToString("N0", culture) ₫
+                    </strong>
+                </div>
+
+                <div class="order-note">
+                    <strong>Thanh toán:</strong>
+                    @order.PaymentStatus
+                    <br />
+                    <strong>Địa chỉ giao hàng:</strong>
+                    @order.AddressDelivery
+                </div>
+
+            </div>
+        }
+    }
+    else
+    {
+        <div class="customer-no-orders">
+
+            <i class="fa-solid fa-cart-shopping"></i>
+
+            <strong>Khách hàng chưa có đơn hàng nào.</strong>
+
+            <p>
+                Lịch sử mua hàng sẽ hiển thị tại đây khi khách đặt hàng.
+            </p>
+
+        </div>
+    }
+
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.CustomerID }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
