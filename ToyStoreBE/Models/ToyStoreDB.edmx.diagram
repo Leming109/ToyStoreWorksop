@@ -10,7 +10,7 @@
         <EntityTypeShape EntityType="ToyStoreBEModel.Order" Width="1.5" PointX="5.375" PointY="4.5" IsExpanded="true" />
         <EntityTypeShape EntityType="ToyStoreBEModel.OrderDetail" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
         <EntityTypeShape EntityType="ToyStoreBEModel.Product" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="ToyStoreBEModel.sysdiagram" Width="1.5" PointX="11.125" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="ToyStoreBEModel.sysdiagram" Width="1.5" PointX="7.875" PointY="3" IsExpanded="true" />
         <EntityTypeShape EntityType="ToyStoreBEModel.User" Width="1.5" PointX="0.5" PointY="4" IsExpanded="true" />
         <AssociationConnector Association="ToyStoreBEModel.FK_Pro_Category" ManuallyRouted="false" />
         <AssociationConnector Association="ToyStoreBEModel.FK__Order__CustomerI__412EB0B6" ManuallyRouted="false" />
