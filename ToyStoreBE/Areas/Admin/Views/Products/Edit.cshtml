@@ -151,18 +151,18 @@
 
     <!-- FORM CẬP NHẬT -->
     @using (Html.BeginForm(
-        "Edit",
-        "Products",
-        new
-        {
-            area = "Admin",
-            id = Model.ProductID
-        },
-        FormMethod.Post,
-        new
-        {
-            enctype = "multipart/form-data"
-        }))
+     "Edit",
+     "Products",
+     new
+     {
+         area = "Admin",
+         id = Model.ProductID
+     },
+     FormMethod.Post,
+     new
+     {
+         @class = "edit-product-form"
+     }))
     {
         @Html.AntiForgeryToken()
 
@@ -180,10 +180,10 @@
             <div class="edit-card-body">
 
                 @Html.ValidationSummary(
-                         true,
-                         "",
-                         new { @class = "text-danger edit-validation" }
-                     )
+                              true,
+                              "",
+                              new { @class = "text-danger edit-validation" }
+                          )
 
                 @Html.Partial("PV_Product", Model)
 
@@ -192,12 +192,12 @@
             <div class="edit-actions">
 
                 @Html.ActionLink(
-                         "Quay lại danh sách",
-                         "Index",
-                         "Products",
-                         new { area = "Admin" },
-                         new { @class = "edit-btn edit-btn-back" }
-                     )
+                              "Quay lại danh sách",
+                              "Index",
+                              "Products",
+                              new { area = "Admin" },
+                              new { @class = "edit-btn edit-btn-back" }
+                          )
 
                 <button type="submit" class="edit-btn edit-btn-save">
                     <i class="fa-solid fa-floppy-disk"></i>

@@ -89,124 +89,47 @@ namespace ToyStoreBE.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CategoryID,ProductName,ProductDecription,ProductPrice,SalePrice,StockQuantity")] Product product)
+        public ActionResult Create(
+    [Bind(Include = "CategoryID,ProductName,ProductDecription,ProductPrice,SalePrice,StockQuantity,ProductImage")]
+    Product product)
         {
             if (product == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            // Nhận ảnh từ form
-            HttpPostedFileBase imageFile = Request.Files["UploadImg"];
+            product.ProductName = (product.ProductName ?? "").Trim();
+            product.ProductDecription = (product.ProductDecription ?? "").Trim();
+            product.ProductImage = (product.ProductImage ?? "").Trim();
 
-            // Khai báo extension bên ngoài để sử dụng ở nhiều vị trí
-            string extension = "";
-
-            if (imageFile != null && imageFile.ContentLength > 0)
-            {
-                extension = Path.GetExtension(imageFile.FileName)
-                    .ToLowerInvariant();
-            }
-
-            // Chuẩn hóa dữ liệu
-            product.ProductName = product.ProductName == null
-                ? null
-                : product.ProductName.Trim();
-
-            product.ProductDecription = product.ProductDecription == null
-                ? null
-                : product.ProductDecription.Trim();
-
-            // Kiểm tra tên sản phẩm
             if (string.IsNullOrWhiteSpace(product.ProductName))
-            {
-                ModelState.AddModelError(
-                    "ProductName",
-                    "Vui lòng nhập tên sản phẩm.");
-            }
+                ModelState.AddModelError("ProductName", "Vui lòng nhập tên sản phẩm.");
 
-            // Kiểm tra mô tả
             if (string.IsNullOrWhiteSpace(product.ProductDecription))
-            {
-                ModelState.AddModelError(
-                    "ProductDecription",
-                    "Vui lòng nhập mô tả sản phẩm.");
-            }
+                ModelState.AddModelError("ProductDecription", "Vui lòng nhập mô tả sản phẩm.");
 
-            // Kiểm tra danh mục
-            bool categoryExists = db.Categories.Any(
-                c => c.CategoryID == product.CategoryID);
+            if (!db.Categories.Any(c => c.CategoryID == product.CategoryID))
+                ModelState.AddModelError("CategoryID", "Vui lòng chọn danh mục hợp lệ.");
 
-            if (!categoryExists)
-            {
-                ModelState.AddModelError(
-                    "CategoryID",
-                    "Vui lòng chọn danh mục hợp lệ.");
-            }
-
-            // Kiểm tra giá bán
             if (product.ProductPrice <= 0)
-            {
-                ModelState.AddModelError(
-                    "ProductPrice",
-                    "Giá bán phải lớn hơn 0.");
-            }
+                ModelState.AddModelError("ProductPrice", "Giá bán phải lớn hơn 0.");
 
-            // Kiểm tra giá khuyến mãi
-            if (product.SalePrice < 0)
-            {
-                ModelState.AddModelError(
-                    "SalePrice",
-                    "Giá khuyến mãi không được âm.");
-            }
+            if (product.SalePrice < 0 || product.SalePrice > product.ProductPrice)
+                ModelState.AddModelError("SalePrice", "Giá khuyến mãi không hợp lệ.");
 
-            // Nếu SalePrice là giá bán sau giảm giá,
-            // giá này không được cao hơn giá gốc.
-            if (product.SalePrice > product.ProductPrice)
-            {
-                ModelState.AddModelError(
-                    "SalePrice",
-                    "Giá khuyến mãi không được lớn hơn giá bán.");
-            }
-
-            // Kiểm tra tồn kho
             if (product.StockQuantity < 0)
+                ModelState.AddModelError("StockQuantity", "Số lượng tồn kho không được âm.");
+
+            // Không nhập ảnh thì dùng ảnh mặc định
+            if (string.IsNullOrWhiteSpace(product.ProductImage))
+            {
+                product.ProductImage = "~/Content/images/default_img.png";
+            }
+            else if (!IsValidProductImage(product.ProductImage))
             {
                 ModelState.AddModelError(
-                    "StockQuantity",
-                    "Số lượng tồn kho không được âm.");
+                    "ProductImage",
+                    "Link ảnh phải bắt đầu bằng http:// hoặc https://.");
             }
 
-            // Kiểm tra ảnh được tải lên
-            if (imageFile != null && imageFile.ContentLength > 0)
-            {
-
-                string[] allowedExtensions =
-                {
-            ".jpg", ".jpeg", ".png", ".webp"
-        };
-
-                if (!allowedExtensions.Contains(extension))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc WEBP.");
-                }
-                else if (imageFile.ContentLength > 5 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Dung lượng ảnh không được vượt quá 5 MB.");
-                }
-                else if (!IsValidImageFile(imageFile, extension))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "File được chọn không phải ảnh hợp lệ.");
-                }
-            }
-
-            // Nếu dữ liệu không hợp lệ thì quay lại form
             if (!ModelState.IsValid)
             {
                 ViewBag.CategoryID = new SelectList(
@@ -218,51 +141,28 @@ namespace ToyStoreBE.Areas.Admin.Controllers
                 return View(product);
             }
 
-            // Ảnh mặc định nếu người dùng không chọn ảnh
-            product.ProductImage = "~/Content/images/default_img.png";
-
-            string savedFilePath = null;
-
             try
             {
-                // Nếu có chọn ảnh mới
-                if (imageFile != null && imageFile.ContentLength > 0)
-                {
-                    string folderPath = Server.MapPath("~/Content/images");
-
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    // Tạo tên file riêng để tránh trùng ảnh
-                    string fileName = Guid.NewGuid().ToString("N") + extension;
-
-                    savedFilePath = Path.Combine(folderPath, fileName);
-
-                    imageFile.SaveAs(savedFilePath);
-
-                    // Lưu đường dẫn ảnh vào database
-                    product.ProductImage = "~/Content/images/" + fileName;
-                }
-
-                // Lưu sản phẩm
                 db.Products.Add(product);
                 db.SaveChanges();
 
                 TempData["Success"] = "Thêm sản phẩm thành công.";
-
                 return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                // Nếu lưu database thất bại thì xóa file ảnh vừa tải lên
-                if (savedFilePath != null && System.IO.File.Exists(savedFilePath))
-                {
-                    System.IO.File.Delete(savedFilePath);
-                }
+                ViewBag.CategoryID = new SelectList(
+                    db.Categories,
+                    "CategoryID",
+                    "CategoryName",
+                    product.CategoryID);
 
-                throw;
+                ModelState.AddModelError(
+                    "",
+                    "Không thể thêm sản phẩm: " +
+                    ex.GetBaseException().Message);
+
+                return View(product);
             }
         }
 
@@ -299,116 +199,58 @@ namespace ToyStoreBE.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(
-    [Bind(Include = "ProductID,ProductName,ProductPrice,SalePrice,StockQuantity")]
+    [Bind(Include = "ProductID,ProductName,ProductPrice,SalePrice,StockQuantity,ProductImage")]
     Product product)
         {
             if (product == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            // Tìm sản phẩm hiện tại trong database
             var existingProduct = db.Products.Find(product.ProductID);
 
             if (existingProduct == null)
-            {
                 return HttpNotFound();
-            }
 
-            // Loại bỏ lỗi xác thực của các trường không cho chỉnh sửa
-            ModelState.Remove("ProductDecription");
-            ModelState.Remove("CategoryID");
-            ModelState.Remove("ProductImage");
-
-            // Giữ nguyên mô tả, danh mục và ảnh cũ
+            // Giữ nguyên mô tả và danh mục
             product.ProductDecription = existingProduct.ProductDecription;
             product.CategoryID = existingProduct.CategoryID;
-            product.ProductImage = existingProduct.ProductImage;
 
-            // Nhận ảnh mới từ form
-            HttpPostedFileBase imageFile = Request.Files["UploadImg"];
+            ModelState.Remove("ProductDecription");
+            ModelState.Remove("CategoryID");
 
-            string extension = "";
+            product.ProductName = (product.ProductName ?? "").Trim();
 
-            if (imageFile != null && imageFile.ContentLength > 0)
-            {
-                extension = Path.GetExtension(imageFile.FileName)
-                    .ToLowerInvariant();
-            }
+            string imageUrl = (product.ProductImage ?? "").Trim();
 
-            // Chuẩn hóa tên sản phẩm
-            product.ProductName = product.ProductName == null
-                ? null
-                : product.ProductName.Trim();
-
-            // Kiểm tra tên sản phẩm
             if (string.IsNullOrWhiteSpace(product.ProductName))
-            {
-                ModelState.AddModelError(
-                    "ProductName",
-                    "Vui lòng nhập tên sản phẩm.");
-            }
+                ModelState.AddModelError("ProductName", "Vui lòng nhập tên sản phẩm.");
 
-            // Kiểm tra giá bán
             if (product.ProductPrice <= 0)
-            {
-                ModelState.AddModelError(
-                    "ProductPrice",
-                    "Giá bán phải lớn hơn 0.");
-            }
+                ModelState.AddModelError("ProductPrice", "Giá bán phải lớn hơn 0.");
 
-            // Kiểm tra giá khuyến mãi
-            if (product.SalePrice < 0)
-            {
-                ModelState.AddModelError(
-                    "SalePrice",
-                    "Giá khuyến mãi không được âm.");
-            }
+            if (product.SalePrice < 0 || product.SalePrice > product.ProductPrice)
+                ModelState.AddModelError("SalePrice", "Giá khuyến mãi không hợp lệ.");
 
-            if (product.SalePrice > product.ProductPrice)
-            {
-                ModelState.AddModelError(
-                    "SalePrice",
-                    "Giá khuyến mãi không được lớn hơn giá bán.");
-            }
-
-            // Kiểm tra số lượng tồn kho
             if (product.StockQuantity < 0)
+                ModelState.AddModelError("StockQuantity", "Số lượng tồn kho không được âm.");
+
+            // Để trống URL thì giữ ảnh hiện tại
+            if (string.IsNullOrWhiteSpace(imageUrl))
             {
-                ModelState.AddModelError(
-                    "StockQuantity",
-                    "Số lượng tồn kho không được âm.");
+                product.ProductImage = existingProduct.ProductImage;
+                ModelState.Remove("ProductImage");
             }
-
-            // Kiểm tra ảnh mới
-            if (imageFile != null && imageFile.ContentLength > 0)
+            else
             {
-                string[] allowedExtensions =
-                {
-            ".jpg", ".jpeg", ".png", ".webp"
-        };
+                product.ProductImage = imageUrl;
 
-                if (!allowedExtensions.Contains(extension))
+                if (!IsValidProductImage(imageUrl))
                 {
                     ModelState.AddModelError(
-                        "",
-                        "Chỉ chấp nhận ảnh JPG, JPEG, PNG hoặc WEBP.");
-                }
-                else if (imageFile.ContentLength > 5 * 1024 * 1024)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Dung lượng ảnh không được vượt quá 5 MB.");
-                }
-                else if (!IsValidImageFile(imageFile, extension))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "File được chọn không phải ảnh hợp lệ.");
+                        "ProductImage",
+                        "Link ảnh phải bắt đầu bằng http:// hoặc https://.");
                 }
             }
 
-            // Nếu dữ liệu không hợp lệ
             if (!ModelState.IsValid)
             {
                 ViewBag.LockCategory = true;
@@ -421,58 +263,38 @@ namespace ToyStoreBE.Areas.Admin.Controllers
                 return View(product);
             }
 
-            string savedFilePath = null;
-
             try
             {
-                // Chỉ thay ảnh khi người dùng chọn ảnh mới
-                if (imageFile != null && imageFile.ContentLength > 0)
-                {
-                    string folderPath = Server.MapPath("~/Content/images");
-
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    string fileName = Guid.NewGuid().ToString("N") + extension;
-
-                    savedFilePath = Path.Combine(folderPath, fileName);
-
-                    imageFile.SaveAs(savedFilePath);
-
-                    existingProduct.ProductImage =
-                        "~/Content/images/" + fileName;
-                }
-
-                // Cập nhật thông tin được phép chỉnh sửa
                 existingProduct.ProductName = product.ProductName;
                 existingProduct.ProductPrice = product.ProductPrice;
                 existingProduct.SalePrice = product.SalePrice;
                 existingProduct.StockQuantity = product.StockQuantity;
 
-                // Không cập nhật ProductDecription
-                // Không cập nhật CategoryID
+                // Cập nhật URL mới nếu có
+                existingProduct.ProductImage = product.ProductImage;
 
                 db.SaveChanges();
 
                 TempData["Success"] = "Cập nhật sản phẩm thành công.";
-
                 return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                // Xóa ảnh mới nếu lưu database thất bại
-                if (savedFilePath != null &&
-                    System.IO.File.Exists(savedFilePath))
-                {
-                    System.IO.File.Delete(savedFilePath);
-                }
+                ViewBag.LockCategory = true;
 
-                throw;
+                ViewBag.CategoryName = db.Categories
+                    .Where(c => c.CategoryID == existingProduct.CategoryID)
+                    .Select(c => c.CategoryName)
+                    .FirstOrDefault();
+
+                ModelState.AddModelError(
+                    "",
+                    "Không thể cập nhật sản phẩm: " +
+                    ex.GetBaseException().Message);
+
+                return View(product);
             }
         }
-
         // GET: Admin/Products/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -586,6 +408,26 @@ namespace ToyStoreBE.Areas.Admin.Controllers
             }
 
             return false;
+        }
+
+        private bool IsValidProductImage(string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return false;
+
+            imageUrl = imageUrl.Trim();
+
+            // Cho phép giữ lại đường dẫn ảnh nội bộ cũ
+            if (imageUrl.StartsWith("~/", StringComparison.Ordinal))
+                return true;
+
+            Uri uri;
+
+            if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out uri))
+                return false;
+
+            return uri.Scheme == Uri.UriSchemeHttp ||
+                   uri.Scheme == Uri.UriSchemeHttps;
         }
 
         protected override void Dispose(bool disposing)

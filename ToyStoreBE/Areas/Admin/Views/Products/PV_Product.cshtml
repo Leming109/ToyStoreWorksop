@@ -162,21 +162,21 @@
         @Html.LabelFor(m => m.ProductName, "Tên sản phẩm")
 
         @Html.TextBoxFor(
-                                m => m.ProductName,
-                                new
-                                {
-                                    @class = "form-control",
-                                    placeholder = "Nhập tên sản phẩm...",
-                                    maxlength = "200",
-                                    required = "required"
-                                }
-                            )
+                                               m => m.ProductName,
+                                               new
+                                               {
+                                                   @class = "form-control",
+                                                   placeholder = "Nhập tên sản phẩm...",
+                                                   maxlength = "200",
+                                                   required = "required"
+                                               }
+                                           )
 
         @Html.ValidationMessageFor(
-                                m => m.ProductName,
-                                "",
-                                new { @class = "text-danger" }
-                            )
+                                               m => m.ProductName,
+                                               "",
+                                               new { @class = "text-danger" }
+                                           )
 
     </div>
 
@@ -197,21 +197,21 @@
         {
             <!-- Khi Create: vẫn cho phép chọn danh mục -->
             @Html.DropDownListFor(
-                     m => m.CategoryID,
-                     (SelectList)ViewBag.CategoryID,
-                     "-- Chọn danh mục --",
-                     new
-                     {
-                         @class = "form-control",
-                         required = "required"
-                     }
-                 )
+                                    m => m.CategoryID,
+                                    (SelectList)ViewBag.CategoryID,
+                                    "-- Chọn danh mục --",
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        required = "required"
+                                    }
+                                )
 
             @Html.ValidationMessageFor(
-                     m => m.CategoryID,
-                     "",
-                     new { @class = "text-danger" }
-                 )
+                                    m => m.CategoryID,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
         }
 
     </div>
@@ -222,22 +222,22 @@
         @Html.LabelFor(m => m.ProductPrice, "Giá bán")
 
         @Html.TextBoxFor(
-                                m => m.ProductPrice,
-                                new
-                                {
-                                    @class = "form-control",
-                                    type = "number",
-                                    min = "0",
-                                    step = "0.01",
-                                    placeholder = "Nhập giá bán..."
-                                }
-                            )
+                                               m => m.ProductPrice,
+                                               new
+                                               {
+                                                   @class = "form-control",
+                                                   type = "number",
+                                                   min = "0",
+                                                   step = "0.01",
+                                                   placeholder = "Nhập giá bán..."
+                                               }
+                                           )
 
         @Html.ValidationMessageFor(
-                                m => m.ProductPrice,
-                                "",
-                                new { @class = "text-danger" }
-                            )
+                                               m => m.ProductPrice,
+                                               "",
+                                               new { @class = "text-danger" }
+                                           )
 
     </div>
 
@@ -247,22 +247,22 @@
         @Html.LabelFor(m => m.SalePrice, "Giá khuyến mãi")
 
         @Html.TextBoxFor(
-                                m => m.SalePrice,
-                                new
-                                {
-                                    @class = "form-control",
-                                    type = "number",
-                                    min = "0",
-                                    step = "0.01",
-                                    placeholder = "Nhập giá khuyến mãi..."
-                                }
-                            )
+                                               m => m.SalePrice,
+                                               new
+                                               {
+                                                   @class = "form-control",
+                                                   type = "number",
+                                                   min = "0",
+                                                   step = "0.01",
+                                                   placeholder = "Nhập giá khuyến mãi..."
+                                               }
+                                           )
 
         @Html.ValidationMessageFor(
-                                m => m.SalePrice,
-                                "",
-                                new { @class = "text-danger" }
-                            )
+                                               m => m.SalePrice,
+                                               "",
+                                               new { @class = "text-danger" }
+                                           )
 
     </div>
 
@@ -272,32 +272,32 @@
         @Html.LabelFor(m => m.StockQuantity, "Số lượng tồn kho")
 
         @Html.TextBoxFor(
-                                m => m.StockQuantity,
-                                new
-                                {
-                                    @class = "form-control",
-                                    type = "number",
-                                    min = "0",
-                                    step = "1",
-                                    placeholder = "Nhập số lượng tồn kho..."
-                                }
-                            )
+                                               m => m.StockQuantity,
+                                               new
+                                               {
+                                                   @class = "form-control",
+                                                   type = "number",
+                                                   min = "0",
+                                                   step = "1",
+                                                   placeholder = "Nhập số lượng tồn kho..."
+                                               }
+                                           )
 
         @Html.ValidationMessageFor(
-                                m => m.StockQuantity,
-                                "",
-                                new { @class = "text-danger" }
-                            )
+                                               m => m.StockQuantity,
+                                               "",
+                                               new { @class = "text-danger" }
+                                           )
 
     </div>
 
 </div>
 
-<!-- UPLOAD ẢNH -->
+<!-- LINK HÌNH ẢNH SẢN PHẨM -->
 <div class="product-upload-area">
 
     <h5>
-        <i class="fa-solid fa-image"></i>
+        <i class="fa-solid fa-link"></i>
         Hình ảnh sản phẩm
     </h5>
 
@@ -311,17 +311,29 @@
 
         <div class="product-upload-input">
 
-            <label for="UploadImg">Chọn ảnh từ máy tính</label>
+            @Html.LabelFor(m => m.ProductImage, "Link hình ảnh sản phẩm")
 
-            <input type="file"
-                   id="UploadImg"
-                   name="UploadImg"
-                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            @Html.TextBoxFor(
+                     m => m.ProductImage,
+                     new
+                     {
+                         @class = "form-control",
+                         id = "ProductImageUrl",
+                         placeholder = "https://example.com/image.jpg",
+                         autocomplete = "off"
+                     }
+                 )
+
+            @Html.ValidationMessageFor(
+                     m => m.ProductImage,
+                     "",
+                     new { @class = "text-danger" }
+                 )
 
             <div class="product-upload-note">
-                Định dạng hỗ trợ: JPG, JPEG, PNG, WEBP.<br />
-                Dung lượng tối đa: 5 MB.<br />
-                Không chọn ảnh mới khi Edit nếu muốn giữ ảnh cũ.
+                Dán đường dẫn ảnh trực tiếp vào ô trên.<br />
+                Hỗ trợ link HTTP hoặc HTTPS.<br />
+                Khi sửa sản phẩm, để trống nếu muốn giữ ảnh cũ.
             </div>
 
             <span id="productImageError"
@@ -330,6 +342,130 @@
         </div>
 
     </div>
+</div>
+
+<script>
+    (function () {
+        var input = document.getElementById("ProductImageUrl");
+        var preview = document.getElementById("productImagePreview");
+        var error = document.getElementById("productImageError");
+
+        if (!input || !preview) return;
+
+        var defaultImage =
+            '@Url.Content("~/Content/images/default_img.png")';
+
+        function updatePreview() {
+            var value = input.value.trim();
+
+            error.textContent = "";
+
+            if (!value) {
+                preview.src = defaultImage;
+                return;
+            }
+
+            if (value.indexOf("~/") === 0) {
+                value = '@Url.Content("~/")' + value.substring(2);
+            }
+            else if (!/^https?:\/\//i.test(value)) {
+                error.textContent =
+                    "Link ảnh phải bắt đầu bằng http:// hoặc https://.";
+
+                preview.src = defaultImage;
+                return;
+            }
+
+            preview.src = value;
+        }
+
+        preview.onerror = function () {
+            preview.src = defaultImage;
+            error.textContent =
+                "Không thể tải ảnh. Vui lòng kiểm tra lại đường dẫn.";
+        };
+
+        input.addEventListener("input", updatePreview);
+        input.addEventListener("change", updatePreview);
+
+        updatePreview();
+    })();
+</script>
+
+<script>
+    (function () {
+        var input = document.getElementById("ProductImageUrl");
+        var preview = document.getElementById("productImagePreview");
+        var error = document.getElementById("productImageError");
+
+        if (!input || !preview) return;
+
+        var defaultImage = '@Url.Content("~/Content/images/default_img.png")';
+        var originalValue = input.value.trim();
+
+        function updatePreview() {
+            var value = input.value.trim();
+
+            error.textContent = "";
+
+            if (!value) {
+                preview.src = defaultImage;
+                return;
+            }
+
+            // Cho phép đường dẫn ảnh nội bộ cũ
+            if (value.indexOf("~/") === 0) {
+                value = '@Url.Content("~/")' + value.substring(2);
+            }
+            else if (!/^https?:\/\//i.test(value)) {
+                error.textContent =
+                    "Vui lòng nhập link ảnh bắt đầu bằng http:// hoặc https://.";
+                preview.src = defaultImage;
+                return;
+            }
+
+            preview.src = value;
+        }
+
+        preview.onerror = function () {
+            preview.src = defaultImage;
+            error.textContent =
+                "Không thể tải ảnh. Vui lòng kiểm tra lại đường dẫn.";
+        };
+
+        input.addEventListener("input", updatePreview);
+
+        input.addEventListener("change", updatePreview);
+
+        updatePreview();
+    })();
+</script>
+
+<!-- MÔ TẢ SẢN PHẨM -->
+<div class="product-edit-description">
+
+    @Html.LabelFor(
+                    m => m.ProductDecription,
+                    "Mô tả sản phẩm"
+                )
+
+    @Html.TextAreaFor(
+                    m => m.ProductDecription,
+                    new
+                    {
+                        @class = "form-control",
+                        rows = "6",
+                        placeholder = "Nhập mô tả chi tiết sản phẩm...",
+                        maxlength = "2000",
+                        required = "required"
+                    }
+                )
+
+    @Html.ValidationMessageFor(
+                    m => m.ProductDecription,
+                    "",
+                    new { @class = "text-danger" }
+                )
 
 </div>
 
