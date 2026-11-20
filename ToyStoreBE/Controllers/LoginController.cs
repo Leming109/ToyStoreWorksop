@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web.Mvc;
-using System.Data.Entity.Validation;
+using ToyStoreBE.Helpers;
 using ToyStoreBE.Models;
 using ToyStoreBE.Models.MyModel;
-using ToyStoreBE.Helpers;
 
 namespace ToyStoreBE.Controllers
 {
@@ -205,7 +206,134 @@ namespace ToyStoreBE.Controllers
             }
         }
 
+        // =========================================
+        // GET: Login/RePass
+        // =========================================
+        [AllowAnonymous]
+        [HttpGet]
+        public ActionResult RePass()
+        {
+            return View(new RePassViewModel());
+        }
 
+
+        // =========================================
+        // POST: Login/RePass
+        // =========================================
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult RePass(RePassViewModel model)
+        {
+            if (model == null)
+            {
+                return new HttpStatusCodeResult(
+                    System.Net.HttpStatusCode.BadRequest);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string contact = (model.Contact ?? "").Trim();
+
+            // Tìm khách hàng bằng email hoặc số điện thoại
+            List<Customer> customers;
+
+            if (contact.Contains("@"))
+            {
+                // Tìm bằng Email, không phân biệt chữ hoa và chữ thường
+                string email = contact.ToLowerInvariant();
+
+                customers = db.Customers
+                    .Where(c =>
+                        c.User != null &&
+                        c.User.UserRole == "C" &&
+                        c.CustomerEmail != null &&
+                        c.CustomerEmail.ToLower() == email)
+                    .ToList();
+            }
+            else
+            {
+                // Chuẩn hóa số điện thoại, bỏ khoảng trắng và dấu phân cách
+                string phone = new string(
+                    contact.Where(c => c >= '0' && c <= '9').ToArray());
+
+                if (phone.Length < 10 || phone.Length > 15)
+                {
+                    ModelState.AddModelError(
+                        "Contact",
+                        "Số điện thoại phải có từ 10 đến 15 chữ số.");
+
+                    return View(model);
+                }
+
+                customers = db.Customers
+                    .Where(c =>
+                        c.User != null &&
+                        c.User.UserRole == "C" &&
+                        c.CustomerPhone == phone)
+                    .ToList();
+            }
+
+            // Không tìm thấy tài khoản hoặc thông tin không duy nhất
+            if (customers.Count == 0)
+            {
+                ModelState.AddModelError(
+                    "Contact",
+                    "Không tìm thấy tài khoản khách hàng với thông tin này.");
+
+                return View(model);
+            }
+
+            if (customers.Count > 1)
+            {
+                ModelState.AddModelError(
+                    "Contact",
+                    "Thông tin liên hệ đang được sử dụng bởi nhiều tài khoản. Vui lòng liên hệ quản trị viên.");
+
+                return View(model);
+            }
+
+            var customer = customers[0];
+
+            // Lấy User tương ứng và chỉ cho phép tài khoản khách hàng
+            var user = db.Users.FirstOrDefault(u =>
+                u.Username == customer.Username &&
+                u.UserRole == "C");
+
+            if (user == null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Không tìm thấy tài khoản khách hàng tương ứng.");
+
+                return View(model);
+            }
+
+            try
+            {
+                // Mã hóa mật khẩu mới bằng cơ chế hiện tại
+                user.Password = CompactPasswordHasher.HashPassword(
+                    model.NewPassword);
+
+                db.SaveChanges();
+
+                TempData["RePassSuccess"] =
+                    "Đổi mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.";
+
+                return RedirectToAction("Login");
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Không thể đổi mật khẩu. Vui lòng thử lại.");
+
+                return View(model);
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
