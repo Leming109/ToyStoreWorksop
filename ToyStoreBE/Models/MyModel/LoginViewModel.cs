@@ -57,10 +57,8 @@ namespace ToyStoreBE.Models.MyModel
     public class RePassViewModel
     {
         [Required(ErrorMessage = "Vui lòng nhập email hoặc số điện thoại.")]
+        [StringLength(254)]
         public string Contact { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập mã xác nhận.")]
-        public string VerificationCode { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
         [StringLength(100, MinimumLength = 8,
@@ -68,7 +66,8 @@ namespace ToyStoreBE.Models.MyModel
         public string NewPassword { get; set; }
 
         [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu.")]
-        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
+        [Compare("NewPassword",
+            ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; }
     }
 }
