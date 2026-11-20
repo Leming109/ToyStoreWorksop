@@ -1,1 +1,255 @@
-﻿
+﻿@model ToyStoreBE.Models.MyModel.RePassViewModel
+
+@{
+    ViewBag.Title = "Quên mật khẩu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .repass-page {
+        max-width: 480px;
+        margin: 45px auto;
+        padding: 0 15px 40px;
+    }
+
+    .repass-card {
+        padding: 32px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.06);
+    }
+
+    .repass-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: #fff1ef;
+        color: #e74c3c;
+        font-size: 27px;
+    }
+
+    .repass-title {
+        margin-bottom: 8px;
+        color: #252525;
+        font-size: 25px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .repass-description {
+        margin-bottom: 25px;
+        color: #777;
+        font-size: 13px;
+        line-height: 1.7;
+        text-align: center;
+    }
+
+    .repass-form .form-group {
+        margin-bottom: 19px;
+    }
+
+    .repass-form label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .repass-form .form-control {
+        width: 100%;
+        height: 46px;
+        padding: 10px 13px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: none;
+        font-size: 14px;
+    }
+
+        .repass-form .form-control:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231,76,60,.12);
+            outline: none;
+        }
+
+    .repass-submit {
+        width: 100%;
+        height: 47px;
+        margin-top: 7px;
+        border: 0;
+        border-radius: 8px;
+        background: #e74c3c;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .repass-submit:hover {
+            background: #c0392b;
+        }
+
+    .repass-back {
+        display: block;
+        margin-top: 20px;
+        color: #e74c3c;
+        text-align: center;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .repass-back:hover {
+            color: #c0392b;
+            text-decoration: underline;
+        }
+
+    .repass-form .text-danger {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+    }
+
+    @@media(max-width: 500px) {
+        .repass-card {
+            padding: 23px 18px;
+        }
+
+        .repass-title {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="repass-page">
+
+    <div class="repass-card">
+
+        <div class="repass-icon">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+
+        <h2 class="repass-title">
+            QUÊN MẬT KHẨU?
+        </h2>
+
+        <p class="repass-description">
+            Nhập email hoặc số điện thoại đã đăng ký,
+            sau đó tạo mật khẩu mới cho tài khoản ToyStore.
+        </p>
+
+        @using (Html.BeginForm(
+            "RePass",
+            "Login",
+            new { area = "" },
+            FormMethod.Post,
+            new { @class = "repass-form" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(
+                     true,
+                     "",
+                     new { @class = "text-danger" }
+                 )
+
+            <div class="form-group">
+
+                @Html.LabelFor(
+                         m => m.Contact,
+                         "Email hoặc số điện thoại"
+                     )
+
+                @Html.TextBoxFor(
+                         m => m.Contact,
+                         new
+                         {
+                             @class = "form-control",
+                             placeholder = "Nhập email hoặc số điện thoại...",
+                             autocomplete = "username"
+                         }
+                     )
+
+                @Html.ValidationMessageFor(
+                         m => m.Contact,
+                         "",
+                         new { @class = "text-danger" }
+                     )
+
+            </div>
+
+            <div class="form-group">
+
+                @Html.LabelFor(
+                         m => m.NewPassword,
+                         "Mật khẩu mới"
+                     )
+
+                @Html.PasswordFor(
+                         m => m.NewPassword,
+                         new
+                         {
+                             @class = "form-control",
+                             placeholder = "Nhập mật khẩu mới...",
+                             autocomplete = "new-password"
+                         }
+                     )
+
+                @Html.ValidationMessageFor(
+                         m => m.NewPassword,
+                         "",
+                         new { @class = "text-danger" }
+                     )
+
+            </div>
+
+            <div class="form-group">
+
+                @Html.LabelFor(
+                         m => m.ConfirmPassword,
+                         "Xác nhận mật khẩu mới"
+                     )
+
+                @Html.PasswordFor(
+                         m => m.ConfirmPassword,
+                         new
+                         {
+                             @class = "form-control",
+                             placeholder = "Nhập lại mật khẩu mới...",
+                             autocomplete = "new-password"
+                         }
+                     )
+
+                @Html.ValidationMessageFor(
+                         m => m.ConfirmPassword,
+                         "",
+                         new { @class = "text-danger" }
+                     )
+
+            </div>
+
+            <button type="submit" class="repass-submit">
+                <i class="fa-solid fa-key"></i>
+                &nbsp; ĐỔI MẬT KHẨU
+            </button>
+        }
+
+        <a href="@Url.Action("Login", "Login", new { area = "" })"
+           class="repass-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            Quay lại đăng nhập
+        </a>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
